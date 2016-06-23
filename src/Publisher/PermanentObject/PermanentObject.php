@@ -13,7 +13,6 @@ use Orpheus\SQLRequest\SQLRequest;
 use Orpheus\Publisher\Transaction\CreateTransactionOperation;
 use Orpheus\Publisher\Exception\InvalidFieldException;
 
-using('sqladapter.SQLAdapter');
 
 /** The permanent object class
  * Manage a permanent object using the SQL Adapter.
