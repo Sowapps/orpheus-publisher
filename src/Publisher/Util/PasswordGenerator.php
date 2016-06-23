@@ -13,7 +13,7 @@ class PasswordGenerator {
 	const CHAR_ALPHA		= 3;//self::CHAR_ALPHA_LOWER|self::CHAR_ALPHA_UPPER;
 	const CHAR_ALPHADIGIT	= 7;//self::CHAR_ALPHA|self::CHAR_DIGIT;
 	const CHAR_ALL			= 15;//self::CHAR_ALPHADIGIT|self::CHAR_SYMBOL;
-
+ 
 	public function __construct() {
 		$this->setPrimarySet(self::CHAR_ALPHA_LOWER, 'abcdefghijklmnopqrstuvwxyz');
 		$this->setPrimarySet(self::CHAR_ALPHA_UPPER, 'ABCDEFGHIJKLMNOPQRSTUVWXYZ');
