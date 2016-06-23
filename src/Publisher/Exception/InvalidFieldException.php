@@ -1,6 +1,6 @@
 <?php
 
-namespace Oprheus\Publisher\Exception;
+namespace Orpheus\Publisher\Exception;
 
 use Orpheus\Exception\UserException;
 

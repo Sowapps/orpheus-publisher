@@ -1,6 +1,6 @@
 <?php
 
-namespace Oprheus\Publisher\Exception;
+namespace Orpheus\Publisher\Exception;
 
 /**
  * The field not found exception class

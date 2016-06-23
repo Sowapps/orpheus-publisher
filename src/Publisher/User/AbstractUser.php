@@ -1,6 +1,6 @@
 <?php
 use Orpheus\Config\Config;
-use Oprheus\Publisher\Exception\UnknownKeyException;
+use Orpheus\Publisher\Exception\UnknownKeyException;
 
 /** The user class
  * The user class represents an user known by the current website as a permanent entity.

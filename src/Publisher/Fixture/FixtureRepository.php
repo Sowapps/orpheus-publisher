@@ -1,6 +1,6 @@
 <?php
 
-namespace Oprheus\Publisher\Fixtures;
+namespace Orpheus\Publisher\Fixtures;
 
 /**
  * The Fixture class

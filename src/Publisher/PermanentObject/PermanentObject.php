@@ -7,11 +7,11 @@ use Orpheus\Exception\NotFoundException;
 use \Exception;
 use Orpheus\Publisher\Transaction\UpdateTransactionOperation;
 use Orpheus\Publisher\Transaction\DeleteTransactionOperation;
-use Oprheus\Publisher\Exception\FieldNotFoundException;
+use Orpheus\Publisher\Exception\FieldNotFoundException;
 use Orpheus\SQLAdapter\SQLAdapter;
 use Orpheus\SQLRequest\SQLRequest;
 use Orpheus\Publisher\Transaction\CreateTransactionOperation;
-use Oprheus\Publisher\Exception\InvalidFieldException;
+use Orpheus\Publisher\Exception\InvalidFieldException;
 
 using('sqladapter.SQLAdapter');
 
