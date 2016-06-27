@@ -2,7 +2,6 @@
 use Orpheus\Config\IniConfig;
 use Orpheus\Config\Config;
 use Orpheus\Hook\Hook;
-use Orpheus\InputController\HTTPController\HTTPRoute;
 
 /**
  * Loader File for the publisher sources
@@ -51,7 +50,7 @@ Hook::register(HOOK_APPREADY, function () {
 
 /** Hook 'runModule'
  */
- /*
+/*
 Hook::register(HOOK_RUNMODULE, function () {
 // 	global $USER_CLASS, $Module;
 	global $Module;
@@ -71,16 +70,6 @@ Hook::register(HOOK_RUNMODULE, function () {
 	}
 });
 */
-
-// TODO: Improve HTTPRoute::registerAccessRestriction
-// Require orpheus-inputcontroller for this feature
-// Maybe we could let the core manager the access restrictions
-HTTPRoute::registerAccessRestriction('role', function($route, $options) {
-	if( !is_string($options) ) {
-		throw new Exception('Invalid route access restriction option in routes config, allow string only');
-	}
-	return User::loggedCanAccessToRoute($route, $options);
-});
 
 function id(&$id) {
 	return $id = intval(is_object($id) ? $id->id() : $id);
