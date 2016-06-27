@@ -1,6 +1,6 @@
 <?php
 
-namespace Orpheus\Publisher\Fixtures;
+namespace Orpheus\Publisher\Fixture;
 
 /**
  * The FixtureInterface interface
