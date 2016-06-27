@@ -4,8 +4,8 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "89743bd755151ba0fd949a2fc758cd68",
-    "content-hash": "e33013a04e4221bd5043a8724f0657d9",
+    "hash": "5f339a31ffb65919de51ea4d86619047",
+    "content-hash": "8db43470da193a13dd2f09a290a1a732",
     "packages": [
         {
             "name": "orpheus/orpheus-cache",
@@ -92,61 +92,6 @@
                 "orpheus"
             ],
             "time": "2016-06-27 13:20:45"
-        },
-        {
-            "name": "orpheus/orpheus-entitydescriptor",
-            "version": "dev-master",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/Sowapps/orpheus-entitydescriptor.git",
-                "reference": "d4a047044f4c7d5cac9b0ddd5a14a0503fc6bb42"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/Sowapps/orpheus-entitydescriptor/zipball/d4a047044f4c7d5cac9b0ddd5a14a0503fc6bb42",
-                "reference": "d4a047044f4c7d5cac9b0ddd5a14a0503fc6bb42",
-                "shasum": ""
-            },
-            "require": {
-                "orpheus/orpheus-cache": "dev-master",
-                "orpheus/orpheus-core": "dev-master",
-                "orpheus/orpheus-hook": "dev-master",
-                "orpheus/orpheus-inputcontroller": "dev-master",
-                "orpheus/orpheus-publisher": "dev-master",
-                "orpheus/orpheus-rendering": "dev-master",
-                "orpheus/orpheus-sqladapter": "dev-master",
-                "orpheus/orpheus-yaml": "dev-master"
-            },
-            "type": "library",
-            "autoload": {
-                "psr-4": {
-                    "Orpheus\\": "src"
-                },
-                "files": [
-                    "src/_loader.php"
-                ]
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "Florent HAZARD",
-                    "email": "contact@sowapps.com",
-                    "homepage": "http://sowapps.com",
-                    "role": "Developer"
-                }
-            ],
-            "description": "Orpheus Entity Descriptor",
-            "keywords": [
-                "database",
-                "entity",
-                "object",
-                "orpheus",
-                "persistent"
-            ],
-            "time": "2016-06-27 12:12:52"
         },
         {
             "name": "orpheus/orpheus-hook",
@@ -394,8 +339,7 @@
         "orpheus/orpheus-sqladapter": 20,
         "orpheus/orpheus-yaml": 20,
         "orpheus/orpheus-rendering": 20,
-        "orpheus/orpheus-inputcontroller": 20,
-        "orpheus/orpheus-entitydescriptor": 20
+        "orpheus/orpheus-inputcontroller": 20
     },
     "prefer-stable": false,
     "prefer-lowest": false,
