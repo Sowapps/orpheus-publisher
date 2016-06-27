@@ -47,9 +47,9 @@ class FormToken {
 		if( !isset($_SESSION[self::SESSION_KEY][$this->name]) ) {
 			$_SESSION[self::SESSION_KEY][$this->name]	= array();
 		}
-		$TOKEN_SESSION	= &$_SESSION[self::SESSION_KEY][$this->name];
+		$TOKEN_SESSION = &$_SESSION[self::SESSION_KEY][$this->name];
 		do {
-			$token	= generatePassword(static::$TOKEN_LENGTH);
+			$token = generatePassword(static::$TOKEN_LENGTH);
 		} while( isset($TOKEN_SESSION[$token]) );
 		if( count($TOKEN_SESSION) >= $this->maxToken ) {
 			array_shift($TOKEN_SESSION);
@@ -100,7 +100,7 @@ class FormToken {
 		if( !isset($_SESSION[self::SESSION_KEY][$this->name]) ) {
 			return false;
 		}
-		$TOKEN_SESSION	= &$_SESSION[self::SESSION_KEY][$this->name];
+		$TOKEN_SESSION = &$_SESSION[self::SESSION_KEY][$this->name];
 		if( empty($token) || empty($TOKEN_SESSION) || !isset($TOKEN_SESSION[$token]) ) {
 			return false;
 		}
