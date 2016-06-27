@@ -122,7 +122,7 @@ class FormToken {
 	}
 	
 	public function validateCurrent(InputRequest $request) {
-		return $this->validate($request->getInput(self::HTML_PREFIX.$this->name));
+		return $this->validate($request->getInputValue(self::HTML_PREFIX.$this->name));
 // 		return $this->validate(POST(self::HTML_PREFIX.$this->name));
 	}
 }
