@@ -4,6 +4,7 @@ namespace Orpheus\Publisher\Form;
 
 use Orpheus\Exception\UserException;
 use Orpheus\Core\Route;
+use Orpheus\InputController\InputRequest;
 
 /**
  * The Form Token class
@@ -114,13 +115,14 @@ class FormToken {
 	 * @param string $domain
 	 * @throws UserException
 	 */
-	public function validateForm($domain=null) {
-		if( !$this->validateCurrent() ) {
+	public function validateForm(InputRequest $request, $domain=null) {
+		if( !$this->validateCurrent($request) ) {
 			throw new UserException(self::ERROR_INVALIDTOKEN, $domain);
 		}
 	}
 	
-	public function validateCurrent($domain=null) {
-		return $this->validate(POST(self::HTML_PREFIX.$this->name));
+	public function validateCurrent(InputRequest $request) {
+		return $this->validate($request->getInput(self::HTML_PREFIX.$this->name));
+// 		return $this->validate(POST(self::HTML_PREFIX.$this->name));
 	}
 }
