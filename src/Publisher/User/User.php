@@ -1,4 +1,7 @@
 <?php
+
+namespace Orpheus\Publisher\User;
+
 /**
  * A basic user class
  * 

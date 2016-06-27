@@ -1,6 +1,10 @@
 <?php
+
+namespace Orpheus\Publisher\User;
+
 use Orpheus\Config\Config;
 use Orpheus\Publisher\Exception\UnknownKeyException;
+use Orpheus\Publisher\PermanentObject\PermanentObject;
 
 /** The user class
  * The user class represents an user known by the current website as a permanent entity.
@@ -10,7 +14,7 @@ use Orpheus\Publisher\Exception\UnknownKeyException;
  * Require core plugin.
  * 
  */
-abstract class AbstractUser extends PermanentEntity {
+abstract class AbstractUser extends PermanentObject {
 	
 	//Attributes
 	protected static $table		= 'user';

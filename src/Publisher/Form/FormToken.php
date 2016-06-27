@@ -1,4 +1,7 @@
 <?php
+
+namespace Orpheus\Publisher\Form;
+
 use Orpheus\Exception\UserException;
 use Orpheus\Core\Route;
 
