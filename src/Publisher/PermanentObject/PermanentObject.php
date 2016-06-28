@@ -12,6 +12,7 @@ use Orpheus\SQLAdapter\SQLAdapter;
 use Orpheus\SQLRequest\SQLRequest;
 use Orpheus\Publisher\Transaction\CreateTransactionOperation;
 use Orpheus\Publisher\Exception\InvalidFieldException;
+use Orpheus\SQLRequest\SQLSelectRequest;
 
 
 /** The permanent object class
