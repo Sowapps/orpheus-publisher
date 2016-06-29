@@ -428,7 +428,8 @@ abstract class PermanentObject {
 	public function remove() {
 		if( $this->isDeleted() ) { return; }
 		$operation = $this->getDeleteOperation();
-		$operation->validate();
+// 		$errors = 0;
+		$operation->validate($errors);
 		return $operation->runIfValid();
 // 		return static::delete($this->id());
 	}

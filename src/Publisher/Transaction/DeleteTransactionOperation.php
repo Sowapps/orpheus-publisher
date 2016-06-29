@@ -13,10 +13,8 @@ class DeleteTransactionOperation extends TransactionOperation {
 		$this->object	= $object;
 	}
 	
-	public function validate(&$errors) {
-		
+	public function validate(&$errors=0) {
 		$this->setIsValid(!$this->object->isDeleted());
-		
 	}
 	
 	public function run() {
