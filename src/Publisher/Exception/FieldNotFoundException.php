@@ -12,7 +12,9 @@ class FieldNotFoundException extends \Exception {
 	protected $fieldname;
 	protected $source;
 	
-	/** Constructor
+	/**
+	 * Constructor
+	 * 
 	 * @param $fieldname The name of the missing field.
 	 * @param $source The source of the exception, optional. Default value is null.
 	 */
