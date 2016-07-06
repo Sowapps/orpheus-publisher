@@ -9,6 +9,7 @@ use Orpheus\Exception\UserException;
  */
 class InvalidFieldException extends UserException {
 	
+	private $key;
 	private $type;
 	private $field;
 	private $value;
@@ -27,8 +28,9 @@ class InvalidFieldException extends UserException {
 	 * @param string $domain
 	 * @param array $typeArgs
 	 */
-	public function __construct($message, $field, $value, $type=null, $domain=null, $typeArgs=array()) {
-		parent::__construct($message, $domain);
+	public function __construct($key, $field, $value, $type=null, $domain=null, $typeArgs=array()) {
+		parent::__construct($key.'_'.$field, $domain);
+		$this->key		= $key;
 		$this->field	= $field;
 		$this->type		= $type;
 		$this->value	= $value;
@@ -80,16 +82,17 @@ class InvalidFieldException extends UserException {
 	 */
 	public function getText() {
 		$args	= $this->args;
-		$msg	= $this->field.'_'.$this->getMessage();
-		if( !hasTranslation($msg, $this->domain) ) {
-			if( hasTranslation($this->getMessage().'_field', $this->domain) ) {
-				$msg	= $this->getMessage().'_field';
-				$args	= array_merge(array('FIELD'=>t($this->getField(), $this->domain)), $args);
-			} else
-			if( hasTranslation($this->getMessage(), $this->domain) ) {
-				$msg	= $this->getMessage();
-			}
-		}
+		$msg	= $this->getMessage();
+// 		$msg	= $this->field.'_'.$this->getMessage();
+// 		if( !hasTranslation($msg, $this->domain) ) {
+// 			if( hasTranslation($this->getMessage().'_field', $this->domain) ) {
+// 				$msg	= $this->getMessage().'_field';
+// 				$args	= array_merge(array('FIELD'=>t($this->getField(), $this->domain)), $args);
+// 			} else
+// 			if( hasTranslation($this->getMessage(), $this->domain) ) {
+// 				$msg	= $this->getMessage();
+// 			}
+// 		}
 		return t($msg, $this->domain, $args);
 	}
 	
