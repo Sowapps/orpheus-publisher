@@ -7,6 +7,11 @@ use Orpheus\Hook\Hook;
  * Loader File for the publisher sources
  */
 
+if( !defined('ORPHEUSPATH') ) {
+	// Do not load in a non-orpheus environment
+	return;
+}
+
 defifn('CHECK_MODULE_ACCESS',	true);
 // defifn('USER_CLASS',			'User');
 // global $USER_CLASS;
