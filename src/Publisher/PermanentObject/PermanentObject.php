@@ -199,7 +199,7 @@ abstract class PermanentObject {
 	 * @overrideit
 	 * 
 	 * This method require to be overridden but it still be called too by the child classes.
-	 * Here $uInputData is not used, it is reserved for child classes.
+	 * Here $input is not used, it is reserved for child classes.
 	 * $data must contain a filled array of new data.
 	 * This method update the EDIT event log.
 	 * Before saving, runForUpdate() is called to let child classes to run custom instructions.
@@ -1252,19 +1252,19 @@ abstract class PermanentObject {
 	/**
 	 * Check user input
 	 * 
-	 * @param array $uInputData The user input data to check.
+	 * @param array $input The user input data to check.
 	 * @param string[] $fields The array of fields to check. Default value is null.
 	 * @param PermanentObject $ref The referenced object (update only). Default value is null.
 	 * @param int $errCount The resulting error count, as pointer. Output parameter.
 	 * @return The valid data.
 	 * 
-	 * Check if the class could generate a valid object from $uInputData.
+	 * Check if the class could generate a valid object from $input.
 	 * The method could modify the user input to fix them but it must return the data.
 	 * The data are passed through the validator, for different cases:
 	 * - If empty, this function return an empty array.
 	 * - If an array, it uses an field => checkMethod association.
 	 */
-	public static function checkUserInput($uInputData, $fields=null, $ref=null, &$errCount=0) {
+	public static function checkUserInput($input, $fields=null, $ref=null, &$errCount=0) {
 		if( !isset($errCount) ) {
 			$errCount = 0;
 		}
@@ -1292,11 +1292,11 @@ abstract class PermanentObject {
 						if( !empty(static::$validator[$field]) ) {
 							$checkMeth	= static::$validator[$field];
 							// If not defined, we just get the value without check
-							$value	= static::$checkMeth($uInputData, $ref);
+							$value	= static::$checkMeth($input, $ref);
 	
 						// Field to NOT validate
-						} else if( array_key_exists($field, $uInputData) ) {
-							$value	= $uInputData[$field];
+						} else if( array_key_exists($field, $input) ) {
+							$value	= $input[$field];
 						} else {
 							$notset	= 1;
 						}
@@ -1308,8 +1308,8 @@ abstract class PermanentObject {
 						}
 
 					} catch( UserException $e ) {
-						if( $value===NULL && isset($uInputData[$field]) ) {
-							$value	= $uInputData[$field];
+						if( $value===NULL && isset($input[$field]) ) {
+							$value	= $input[$field];
 						}
 						throw InvalidFieldException::from($e, $field, $value);
 					}
@@ -1323,10 +1323,10 @@ abstract class PermanentObject {
 		
 		} else if( is_object(static::$validator) ) {
 			if( method_exists(static::$validator, 'validate') ) {
-// 				debug('Pass validator with input', $uInputData);
+// 				debug('Pass validator with input', $input);
 // 				debug('Pass validator with fields', $fields);
-// 				debug('Pass validator with result', static::$validator->validate($uInputData, $fields, $ref, $errCount));
-				return static::$validator->validate($uInputData, $fields, $ref, $errCount);
+// 				debug('Pass validator with result', static::$validator->validate($input, $fields, $ref, $errCount));
+				return static::$validator->validate($input, $fields, $ref, $errCount);
 			}
 		}
 		return array();
@@ -1348,7 +1348,7 @@ abstract class PermanentObject {
 	/**
 	 * Test user input
 	 * 
-	 * @param $uInputData The new data to process.
+	 * @param $input The new data to process.
 	 * @param $fields The array of fields to check. Default value is null.
 	 * @param $ref The referenced object (update only). Default value is null.
 	 * @param $errCount The resulting error count, as pointer. Output parameter.
@@ -1357,8 +1357,8 @@ abstract class PermanentObject {
 	 * 
 	 * Does a checkUserInput() and a checkForObject()
 	 */
-	public static function testUserInput($uInputData, $fields=null, $ref=null, &$errCount=0) {
-		$data = static::checkUserInput($uInputData, $fields, $ref, $errCount);
+	public static function testUserInput($input, $fields=null, $ref=null, &$errCount=0) {
+		$data = static::checkUserInput($input, $fields, $ref, $errCount);
 		if( $errCount ) { return false; }
 		try {
 			static::checkForObject($data, $ref);
