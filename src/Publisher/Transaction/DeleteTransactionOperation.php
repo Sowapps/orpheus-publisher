@@ -4,10 +4,23 @@ namespace Orpheus\Publisher\Transaction;
 
 use Orpheus\Publisher\PermanentObject\PermanentObject;
 
+/**
+ * The DeleteTransactionOperation class
+ *
+ * Transaction operation to delete objects from DBMS
+ *
+ * @author Florent Hazard <contact@sowapps.com>
+ */
 class DeleteTransactionOperation extends TransactionOperation {
 
 	protected $object;
-
+	
+	/**
+	 * Constructor
+	 * 
+	 * @param string $class
+	 * @param PermanentObject $object
+	 */
 	public function __construct($class, PermanentObject $object) {
 		parent::__construct($class);
 		$this->object	= $object;

@@ -1,4 +1,11 @@
 <?php
+/**
+ * The Permanent Object class
+ *
+ * Permanent objects are persisted in DBMS using SQL Adapter
+ *
+ * @author Florent Hazard <contact@sowapps.com>
+ */
 
 namespace Orpheus\Publisher\PermanentObject;
 
@@ -27,13 +34,30 @@ abstract class PermanentObject {
 	
 	protected static $table				= null;
 	protected static $DBInstance		= null;
-	// Contains all fields
+	
+	/**
+	 * The fields of this object
+	 * 
+	 * @var array
+	 */
 	protected static $fields			= array();
 	// Contains fields editables by users
 	protected static $editableFields	= null;
-	// Contains the validator. The default one is an array system.
+	
+	/**
+	 * The validator
+	 * The default one is an array system.
+	 * 
+	 * @var array
+	 */
 	protected static $validator			= array();//! See checkUserInput()
-	// Contains the domain. Used as default UserException domain.
+	
+	/**
+	 * The domain of this class
+	 * Used as default for translations.
+	 * 
+	 * @var unknown
+	 */
 	protected static $domain			= null;
 	
 	protected $modFields	= array();
