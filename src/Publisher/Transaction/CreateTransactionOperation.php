@@ -2,13 +2,43 @@
 
 namespace Orpheus\Publisher\Transaction;
 
+/**
+ * The CreateTransactionOperation class
+ *
+ * Transaction operation to create objects into DBMS
+ *
+ * @author Florent Hazard <contact@sowapps.com>
+ */
 class CreateTransactionOperation extends TransactionOperation {
-
+	
+	/**
+	 * The data to insert
+	 * 
+	 * @var array
+	 */
 	protected $data;
+	
+	/**
+	 * Fields to restrict creation
+	 * 
+	 * @var string[]
+	 */
 	protected $fields;
 	
+	/**
+	 * The resulting ID after inserted data
+	 * 
+	 * @var string
+	 */
 	protected $insertID;
 	
+	/**
+	 * Constructor
+	 * 
+	 * @param string $class
+	 * @param array $data
+	 * @param string[] $fields
+	 */
 	public function __construct($class, array $data, $fields) {
 		parent::__construct($class);
 		$this->data		= $data;
@@ -29,11 +59,10 @@ class CreateTransactionOperation extends TransactionOperation {
 	}
 	
 	public function run() {
-		// TODO Developer and use an SQLCreateRequest class
+		// TODO : Use an SQLCreateRequest class
 		$class = $this->class;
 		$queryOptions = $class::extractCreateQuery($this->data);
 
-// 		$sqlAdapter	= $this->getTransactionOperationSet()->getSQLAdapter();
 		$sqlAdapter	= $this->getSQLAdapter();
 		
 		$r = $sqlAdapter->insert($queryOptions);
@@ -46,14 +75,13 @@ class CreateTransactionOperation extends TransactionOperation {
 			return $this->insertID;
 		}
 		return 0;
-		
-// 		SQLAdapter::doInsert($options, static::$DBInstance, static::$IDFIELD);
-// 		$LastInsert	= SQLAdapter::doLastID(static::$table, static::$IDFIELD, static::$DBInstance);
-		// To do after insertion
-// 		static::applyToObject($data, $LastInsert);
-// 		static::onSaved($data, $LastInsert);
 	}
 	
+	/**
+	 * Get the last inserted data's id
+	 * 
+	 * @return string
+	 */
 	public function getInsertID() {
 		return $this->insertID;
 	}

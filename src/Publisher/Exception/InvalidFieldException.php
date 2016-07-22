@@ -4,24 +4,52 @@ namespace Orpheus\Publisher\Exception;
 
 use Orpheus\Exception\UserException;
 
-/** The invalid field exception class
+/**
+ * The invalid field exception class
+ * 
  * This exception is thrown when we try to validate a form field and it's invalid.
  */
 class InvalidFieldException extends UserException {
 	
-	private $key;
-	private $type;
-	private $field;
-	private $value;
-	private $args;
-// 	private $path;
+	/**
+	 * The message key
+	 * 
+	 * @var string
+	 */
+	protected $key;
 	
-// 	public static $Path = null;
+	/**
+	 * The type
+	 * 
+	 * @var string
+	 */
+	protected $type;
 	
-	// $field is INPUT field (not always the same as db field)
+	/**
+	 * The input field name
+	 * 
+	 * @var string
+	 */
+	protected $field;
+	
+	/**
+	 * The value that is not valid
+	 * 
+	 * @var string
+	 */
+	protected $value;
+	
+	/**
+	 * The arguments of this check
+	 * 
+	 * @var array
+	 */
+	protected $args;
+	
 	/**
 	 * Constructor
-	 * @param string $message
+	 * 
+	 * @param string $key
 	 * @param string $field
 	 * @param string $value
 	 * @param string $type
@@ -39,6 +67,7 @@ class InvalidFieldException extends UserException {
 	
 	/**
 	 * Get the field
+	 * 
 	 * @return string
 	 */
 	public function getField() {
@@ -47,6 +76,7 @@ class InvalidFieldException extends UserException {
 	
 	/**
 	 * Get the type of the field
+	 * 
 	 * @return string
 	 */
 	public function getType() {
@@ -58,6 +88,7 @@ class InvalidFieldException extends UserException {
 	 * @return string
 	 */
 	public function getValue() {
+		
 		return $this->value;
 	}
 	
@@ -70,6 +101,7 @@ class InvalidFieldException extends UserException {
 	
 	/**
 	 * Get the field's arguments
+	 * 
 	 * @return array
 	 */
 	public function getArgs() {
@@ -78,6 +110,7 @@ class InvalidFieldException extends UserException {
 	
 	/**
 	 * Get the user's message
+	 * 
 	 * @return string The translated message from this exception
 	 */
 	public function getText() {
@@ -98,6 +131,7 @@ class InvalidFieldException extends UserException {
 	
 	/**
 	 * Get the key for this field and message
+	 * 
 	 * @return string
 	 */
 	public function getKey() {
@@ -106,6 +140,7 @@ class InvalidFieldException extends UserException {
 	
 	/**
 	 * Get the report from this exception
+	 * 
 	 * @return string
 	 */
 	public function getReport() {
@@ -114,6 +149,7 @@ class InvalidFieldException extends UserException {
 	
 	/**
 	 * Convert an UserException into an InvalidFieldException using other parameters
+	 * 
 	 * @param UserException $e
 	 * @param string $field
 	 * @param string $value

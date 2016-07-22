@@ -88,7 +88,7 @@ abstract class TransactionOperation {
 	 * 
 	 * @param array $errors
 	 */
-	public abstract function validate(&$errors);
+	public abstract function validate(&$errors=0);
 	
 	/**
 	 * Run this operation

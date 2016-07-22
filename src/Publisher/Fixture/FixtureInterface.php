@@ -9,6 +9,9 @@ namespace Orpheus\Publisher\Fixture;
  */
 interface FixtureInterface {
 	
+	/**
+	 * Load fixtures
+	 */
 	public static function loadFixtures();
 	
 }

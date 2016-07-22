@@ -1,11 +1,13 @@
 <?php
-use Orpheus\Config\IniConfig;
-use Orpheus\Config\Config;
-use Orpheus\Hook\Hook;
-
 /**
  * Loader File for the publisher sources
  */
+
+use Orpheus\Config\IniConfig;
+use Orpheus\Config\Config;
+use Orpheus\Hook\Hook;
+use Orpheus\Publisher\PermanentObject\PermanentObject;
+
 
 if( !defined('ORPHEUSPATH') ) {
 	// Do not load in a non-orpheus environment
@@ -76,6 +78,12 @@ Hook::register(HOOK_RUNMODULE, function () {
 });
 */
 
+/**
+ * Get the id whatever we give to it
+ * 
+ * @param int|string|PermanentObject $id
+ * @return int
+ */
 function id(&$id) {
 	return $id = intval(is_object($id) ? $id->id() : $id);
 }

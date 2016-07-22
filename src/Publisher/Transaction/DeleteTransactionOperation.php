@@ -12,7 +12,12 @@ use Orpheus\Publisher\PermanentObject\PermanentObject;
  * @author Florent Hazard <contact@sowapps.com>
  */
 class DeleteTransactionOperation extends TransactionOperation {
-
+	
+	/**
+	 * The object of this operation
+	 * 
+	 * @var PermanentObject
+	 */
 	protected $object;
 	
 	/**

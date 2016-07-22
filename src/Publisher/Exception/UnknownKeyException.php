@@ -9,19 +9,23 @@ namespace Orpheus\Publisher\Exception;
 */
 class UnknownKeyException extends \Exception {
 	
-	private $key;
+	protected $key;
 	
-	/** Constructor
-	 * @param $message The message.
-	 * @param $key The unknown key.
+	/**
+	 * Constructor
+	 * 
+	 * @param string $message The message.
+	 * @param string $key The unknown key.
 	 */
 	public function __construct($message, $key) {
 		parent::__construct($message, 1002);
 		$this->key = (string) $key;
 	}
 	
-	/** Gets the unknown key
-	 * @return The key.
+	/**
+	 * Get the unknown key
+	 * 
+	 * @return string The key.
 	 */
 	public function getKey() {
 		return $this->key;

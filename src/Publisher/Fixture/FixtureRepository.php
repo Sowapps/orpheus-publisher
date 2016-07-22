@@ -8,14 +8,29 @@ namespace Orpheus\Publisher\Fixture;
  * This interface is used to register fixtures.
  */
 class FixtureRepository {
-
+	
+	/**
+	 * All the registered fixtures
+	 * 
+	 * @var array
+	 */
 	protected static $fixtures	= array();
 	
+	/**
+	 * Register $class having some fixtures to load
+	 * 
+	 * @param string $class
+	 */
 	public static function register($class) {
 		if( array_key_exists($class, static::$fixtures) ) { continue; }
 		static::$fixtures[$class] = null;
 	}
 	
+	/**
+	 * List all classes having some fixtures to load
+	 * 
+	 * @return string[]
+	 */
 	public static function listAll() {
 		$r = array();
 		foreach( static::$fixtures as $class => &$state ) {
