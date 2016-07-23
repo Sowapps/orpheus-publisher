@@ -1,4 +1,7 @@
 <?php
+/**
+ * TransactionOperation
+ */
 
 namespace Orpheus\Publisher\Transaction;
 

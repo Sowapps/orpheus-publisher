@@ -1,4 +1,7 @@
 <?php
+/**
+ * DeleteTransactionOperation
+ */
 
 namespace Orpheus\Publisher\Transaction;
 

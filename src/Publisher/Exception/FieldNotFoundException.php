@@ -1,4 +1,7 @@
 <?php
+/**
+ * FieldNotFoundException
+ */
 
 namespace Orpheus\Publisher\Exception;
 

@@ -1,4 +1,7 @@
 <?php
+/**
+ * UnknownKeyException
+ */
 
 namespace Orpheus\Publisher\Exception;
 
@@ -9,6 +12,11 @@ namespace Orpheus\Publisher\Exception;
 */
 class UnknownKeyException extends \Exception {
 	
+	/**
+	 * The key of success
+	 * 
+	 * @var string
+	 */
 	protected $key;
 	
 	/**

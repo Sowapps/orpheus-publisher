@@ -23,7 +23,8 @@ use Orpheus\SQLRequest\SQLSelectRequest;
 
 
 /**
-	 * The permanent object class
+ * The permanent object class
+ * 
  * Manage a permanent object using the SQL Adapter.
  */
 abstract class PermanentObject {

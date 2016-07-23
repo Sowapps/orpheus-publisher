@@ -1,9 +1,12 @@
 <?php
+/**
+ * FixtureRepository
+ */
 
 namespace Orpheus\Publisher\Fixture;
 
 /**
- * The Fixture class
+ * The FixtureRepository class
  * 
  * This interface is used to register fixtures.
  */

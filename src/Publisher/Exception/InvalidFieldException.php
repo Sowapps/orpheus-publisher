@@ -1,4 +1,7 @@
 <?php
+/**
+ * InvalidFieldException
+ */
 
 namespace Orpheus\Publisher\Exception;
 

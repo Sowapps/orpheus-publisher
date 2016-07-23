@@ -1,4 +1,7 @@
 <?php
+/**
+ * FixtureInterface
+ */
 
 namespace Orpheus\Publisher\Fixture;
 
