@@ -12,6 +12,9 @@ use Orpheus\Publisher\PermanentObject\PermanentObject;
  * The Transaction Object Set class
  * 
  * This class is about a transaction with multiple operation for an adapter
+ * 
+ * @author Florent Hazard <contact@sowapps.com>
+ *
  */
 class TransactionOperationSet implements \IteratorAggregate {
 
@@ -90,6 +93,11 @@ class TransactionOperationSet implements \IteratorAggregate {
 		}
 	}
 	
+	/**
+	 * 
+	 * {@inheritDoc}
+	 * @see IteratorAggregate::getIterator()
+	 */
 	public function getIterator() {
 		return new \ArrayIterator($this->operations);
 	}

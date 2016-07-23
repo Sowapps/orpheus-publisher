@@ -7,6 +7,12 @@ namespace Orpheus\Publisher\Transaction;
 
 use Orpheus\SQLAdapter\SQLAdapter;
 
+/**
+ * The TransactionOperation class
+ * 
+ * @author Florent Hazard <contact@sowapps.com>
+ *
+ */
 abstract class TransactionOperation {
 	
 	/**
