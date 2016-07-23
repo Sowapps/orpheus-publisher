@@ -83,6 +83,7 @@ Hook::register(HOOK_RUNMODULE, function () {
  * 
  * @param int|string|PermanentObject $id
  * @return int
+ * @see \Orpheus\Publisher\PermanentObject\PermanentObject::object()
  */
 function id(&$id) {
 	return $id = intval(is_object($id) ? $id->id() : $id);
