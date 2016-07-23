@@ -51,7 +51,13 @@ class UpdateTransactionOperation extends TransactionOperation {
 		$this->fields	= $fields;
 		$this->object	= $object;
 	}
-	
+
+	/**
+	 *
+	 * {@inheritDoc}
+	 * @see \Orpheus\Publisher\Transaction\TransactionOperation::validate()
+	 * @param array $errors
+	 */
 	public function validate(&$errors=0) {
 		$class = $this->class;
 		$newErrors = 0;
@@ -63,6 +69,11 @@ class UpdateTransactionOperation extends TransactionOperation {
 		$errors	+= $newErrors;
 	}
 	
+	/**
+	 * 
+	 * {@inheritDoc}
+	 * @see \Orpheus\Publisher\Transaction\TransactionOperation::run()
+	 */
 	public function run() {
 		// TODO : Use a SQLUpdateRequest class
 		$class = $this->class;

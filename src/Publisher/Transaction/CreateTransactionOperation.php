@@ -48,6 +48,12 @@ class CreateTransactionOperation extends TransactionOperation {
 		$this->fields	= $fields;
 	}
 	
+	/**
+	 * 
+	 * {@inheritDoc}
+	 * @see \Orpheus\Publisher\Transaction\TransactionOperation::validate()
+	 * @param array $errors
+	 */
 	public function validate(&$errors) {
 		$class = $this->class;
 // 		$class::checkUserInput($input, $fields, $this, $errCount);
@@ -61,6 +67,11 @@ class CreateTransactionOperation extends TransactionOperation {
 		$this->setValid();
 	}
 	
+	/**
+	 * 
+	 * {@inheritDoc}
+	 * @see \Orpheus\Publisher\Transaction\TransactionOperation::run()
+	 */
 	public function run() {
 		// TODO : Use an SQLCreateRequest class
 		$class = $this->class;
