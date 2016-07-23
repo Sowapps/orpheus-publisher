@@ -943,7 +943,7 @@ abstract class PermanentObject {
 	/**
 	 * Escape identifier through instance
 	 * 
-	 * @param	string $Identifier The identifier to escape. Default is table name.
+	 * @param	string $identifier The identifier to escape. Default is table name.
 	 * @return	string The escaped identifier
 	 * @see SQLAdapter::escapeIdentifier()
 	 * @see static::ei()
@@ -957,7 +957,7 @@ abstract class PermanentObject {
 	/**
 	 * Escape identifier through instance
 	 * 
-	 * @param	string $Identifier The identifier to escape. Default is table name.
+	 * @param	string $identifier The identifier to escape. Default is table name.
 	 * @return	string The escaped identifier
 	 * @see static::escapeIdentifier()
 	 */
@@ -1336,6 +1336,11 @@ abstract class PermanentObject {
 		return true;
 	}
 	
+	/**
+	 * Store data about known classes
+	 * 
+	 * @var array
+	 */
 	protected static $knownClassData	= array();
 	
 	/**

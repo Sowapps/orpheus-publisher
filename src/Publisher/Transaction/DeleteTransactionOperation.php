@@ -34,10 +34,21 @@ class DeleteTransactionOperation extends TransactionOperation {
 		$this->object	= $object;
 	}
 	
+	/**
+	 * 
+	 * {@inheritDoc}
+	 * @see \Orpheus\Publisher\Transaction\TransactionOperation::validate()
+	 * @param array $errors
+	 */
 	public function validate(&$errors=0) {
 		$this->setIsValid(!$this->object->isDeleted());
 	}
 	
+	/**
+	 * 
+	 * {@inheritDoc}
+	 * @see \Orpheus\Publisher\Transaction\TransactionOperation::run()
+	 */
 	public function run() {
 		// Testing generating query in this class
 		$class = $this->class;
