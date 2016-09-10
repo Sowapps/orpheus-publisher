@@ -54,7 +54,7 @@ class CreateTransactionOperation extends TransactionOperation {
 	 * @see \Orpheus\Publisher\Transaction\TransactionOperation::validate()
 	 * @param array $errors
 	 */
-	public function validate(&$errors) {
+	public function validate(&$errors=0) {
 		$class = $this->class;
 // 		$class::checkUserInput($input, $fields, $this, $errCount);
 		$newErrors = 0;
