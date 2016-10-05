@@ -409,7 +409,7 @@ abstract class PermanentObject {
 	 * Callbakc when object was saved
 	 * 
 	 * @param array $data
-	 * @param PermanentObject $object
+	 * @param int|PermanentObject $object
 	 */
 	public static function onSaved(array $data, $object) { }
 	
@@ -444,9 +444,9 @@ abstract class PermanentObject {
 		$this->modFields	= array();
 		if( !$this->onSavedInProgress ) {
 			// Protect script against saving loops
-			$this->onSavedInProgress	= true;
+			$this->onSavedInProgress = true;
 			static::onSaved($data, $this);
-			$this->onSavedInProgress	= false;
+			$this->onSavedInProgress = false;
 		}
 		return $r;
 	}

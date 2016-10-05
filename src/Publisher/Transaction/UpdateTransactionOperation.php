@@ -85,7 +85,7 @@ class UpdateTransactionOperation extends TransactionOperation {
 		if( $r ) {
 			// Success
 			$this->object->reload();
-			$class::onSaved($this->data, $this);
+			$class::onSaved($this->data, $this->object);
 			return 1;
 		}
 		return 0;
