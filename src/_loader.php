@@ -24,11 +24,12 @@ define('HOOK_ACCESSDENIED', 	'accessDenied');
 Hook::create(HOOK_ACCESSDENIED);
 
 /**
- * Hook HOOK_APPREADY
+ * Hook HOOK_SESSIONSTARTED
+ * Previously HOOK_APPREADY but now session is started by route process in Input Controller
  * Previously HOOK_CHECKMODULE but we need session was initialized before checking app things
  * HOOK_CHECKMODULE is called before session is initialized
  */
-Hook::register(HOOK_APPREADY, function () {
+Hook::register(HOOK_SESSIONSTARTED, function () {
 // 	debug('Publisher HOOK_APPREADY => '.HOOK_APPREADY);
 // 	global $USER_CLASS;
 	$GLOBALS['ACCESS'] = IniConfig::build('access', true);
