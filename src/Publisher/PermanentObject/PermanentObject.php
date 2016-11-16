@@ -724,7 +724,7 @@ abstract class PermanentObject {
 		return array(
 			$event.'_time'	=> isset($time) ? $time : time(),
 			$event.'_date'	=> isset($time) ? sqlDatetime($time) : sqlDatetime(),
-			$event.'_ip'	=> isset($ipAdd) ? $ipAdd : (!empty($_SERVER['REMOTE_ADDR']) ? $_SERVER['REMOTE_ADDR'] : 'NONE' ),
+			$event.'_ip'	=> isset($ipAdd) ? $ipAdd : (!empty($_SERVER['REMOTE_ADDR']) ? $_SERVER['REMOTE_ADDR'] : '127.0.0.1' ),
 		);
 	}
 	
