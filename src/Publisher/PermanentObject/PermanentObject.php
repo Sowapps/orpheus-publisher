@@ -699,7 +699,8 @@ abstract class PermanentObject {
 			return;
 		}
 		if( in_array($event.'_ip', static::$fields) ) {
-			$array[$event.'_ip'] = !empty($_SERVER['REMOTE_ADDR']) ? $_SERVER['REMOTE_ADDR'] : null;
+			$array[$event.'_ip'] = clientIP();
+// 			$array[$event.'_ip'] = !empty($_SERVER['REMOTE_ADDR']) ? $_SERVER['REMOTE_ADDR'] : '127.0.0.1';
 		}
 		if( in_array($event.'_agent', static::$fields) ) {
 			$array[$event.'_agent'] = !empty($_SERVER['HTTP_USER_AGENT']) ? $_SERVER['HTTP_USER_AGENT'] : null;
