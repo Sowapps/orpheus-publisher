@@ -896,6 +896,19 @@ abstract class PermanentObject {
 	}
 	
 	/**
+	 * Get cache stats
+	 * 
+	 * @return \Orpheus\Publisher\PermanentObject\PermanentObject
+	 */
+	protected function getCacheStats() {
+		return array_sum(array_map('count', static::$instances));
+// 		$total = 0;
+// 		foreach( static::$instances as $cInstances ) {
+// 			$total
+// 		}
+	}
+	
+	/**
 	 * Delete a permanent object
 	 * 
 	 * @param int $in The object ID to delete or the delete array.
