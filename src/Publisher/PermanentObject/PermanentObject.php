@@ -900,7 +900,7 @@ abstract class PermanentObject {
 	 * 
 	 * @return \Orpheus\Publisher\PermanentObject\PermanentObject
 	 */
-	public function getCacheStats() {
+	public static function getCacheStats() {
 		return array_sum(array_map('count', static::$instances));
 // 		$total = 0;
 // 		foreach( static::$instances as $cInstances ) {
