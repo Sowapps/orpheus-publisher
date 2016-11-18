@@ -25,7 +25,9 @@ class FixtureRepository {
 	 * @param string $class
 	 */
 	public static function register($class) {
-		if( array_key_exists($class, static::$fixtures) ) { continue; }
+		if( array_key_exists($class, static::$fixtures) ) {
+			return;
+		}
 		static::$fixtures[$class] = null;
 	}
 	
