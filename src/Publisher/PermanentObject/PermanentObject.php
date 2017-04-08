@@ -777,8 +777,8 @@ abstract class PermanentObject {
 			return $options->run();
 		}
 		if( is_string($options) ) {
-			$options = array();
 			$args = func_get_args();
+			$options = array();// Pointing argument
 			foreach( array('where', 'orderby') as $i => $key ) {
 				if( !isset($args[$i]) ) { break; }
 				$options[$key] = $args[$i];
