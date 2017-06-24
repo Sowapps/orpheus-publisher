@@ -406,7 +406,7 @@ abstract class PermanentObject {
 	public static function onValidateInput(array &$input, &$fields, $object) { }
 	
 	/**
-	 * Callbakc when object was saved
+	 * Callback when object was saved
 	 * 
 	 * @param array $data
 	 * @param int|PermanentObject $object

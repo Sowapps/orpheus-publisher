@@ -32,7 +32,8 @@ Hook::create(HOOK_ACCESSDENIED);
 Hook::register(HOOK_SESSIONSTARTED, function () {
 // 	debug('Publisher HOOK_APPREADY => '.HOOK_APPREADY);
 // 	global $USER_CLASS;
-	$GLOBALS['ACCESS'] = IniConfig::build('access', true);
+	// No more in Orpheus, each page should specify the acces required right in routes.yaml
+// 	$GLOBALS['ACCESS'] = IniConfig::build('access', true);
 	$GLOBALS['RIGHTS'] = IniConfig::build('rights', true);
 	
 	if( User::isLogged() ) {
