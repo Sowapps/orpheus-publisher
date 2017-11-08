@@ -1457,7 +1457,7 @@ abstract class PermanentObject {
 	/**
 	 * Translate text according to the object domain
 	 * 
-	 * @param sting $text The text to translate
+	 * @param string $text The text to translate
  	 * @param array|string $values The values array to replace in text. Could be used as second parameter.
 	 * @see t()
 	 * 
