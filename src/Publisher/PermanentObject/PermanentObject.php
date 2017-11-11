@@ -246,7 +246,7 @@ abstract class PermanentObject {
 	/**
 	 * Get this permanent object's ID
 	 * 
-	 * @return The id of this object.
+	 * @return int The id of this object.
 	 * 
 	 * Get this object ID according to the IDFIELD attribute.
 	 */
@@ -257,7 +257,7 @@ abstract class PermanentObject {
 	/**
 	 * Get this permanent object's unique ID
 	 * 
-	 * @return The uid of this object.
+	 * @return string The uid of this object.
 	 * 
 	 * Get this object ID according to the table and id.
 	 */
@@ -604,7 +604,6 @@ abstract class PermanentObject {
 			return $this->data;
 		}
 		if( !array_key_exists($key, $this->data) ) {
-// 			log_debug('Key "'.$key.'" not found in array : '.print_r($this->data, 1));
 			throw new FieldNotFoundException($key, static::getClass());
 		}
 		return $this->data[$key];
@@ -620,18 +619,23 @@ abstract class PermanentObject {
 	 * Set the field $key with the new $value.
 	 */
 	public function setValue($key, $value) {
-		if( !isset($key) ) {//$value
+		if( !isset($key) ) {
+			// Invalid key
 			throw new Exception("nullKey");
+			
 		} else
 		if( !in_array($key, static::$fields) ) {
+			// Unknown key
 			throw new FieldNotFoundException($key, static::getClass());
+			
 		} else
 		if( $key === static::$IDFIELD ) {
+			// ID is not editable
 			throw new Exception("idNotEditable");
+			
 		} else
-// 		if( empty($this->data[$key]) || $value !== $this->data[$key] ) {
-		// If new value is different
 		if( $value !== $this->data[$key] ) {
+			// The value is different
 			$this->addModFields($key);
 			$this->data[$key] = $value;
 		}
