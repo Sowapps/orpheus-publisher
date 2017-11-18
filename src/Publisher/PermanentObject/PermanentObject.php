@@ -763,7 +763,7 @@ abstract class PermanentObject {
 	 * Get some permanent objects
 	 * 
 	 * @param array $options The options used to get the permanents object
-	 * @return SQLSelectRequest|static|static[] An array of array containing object's data
+	 * @return Orpheus\SQLRequest\SQLSelectRequest|static|static[] An array of array containing object's data
 	 * @see SQLAdapter
 	 * 
 	 * Get an objects' list using this class' table.
