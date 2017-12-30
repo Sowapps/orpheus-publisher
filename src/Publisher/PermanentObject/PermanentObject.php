@@ -1125,7 +1125,7 @@ abstract class PermanentObject {
 	 * @param	array $input The input data we will check, extract and create the new object.
 	 * @param	array|null $fields The array of fields to check. Default value is null.
 	 * @param	int $errCount Output parameter to get the number of found errors. Default value is 0
-	 * @return	PermanentObject The new permanent object
+	 * @return	static The new permanent object
 	 * @see testUserInput()
 	 * @see create()
 	 *
