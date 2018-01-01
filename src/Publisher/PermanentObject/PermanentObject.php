@@ -767,6 +767,16 @@ abstract class PermanentObject {
 	}
 	
 	/**
+	 * Get select query
+	 *
+	 * @return SQLSelectRequest The query
+	 * @see SQLAdapter
+	 */
+	public static function select() {
+		return SQLRequest::select(static::getSQLAdapter(), static::$IDFIELD, static::getClass())->from(static::$table)->asObjectList();
+	}
+	
+	/**
 	 * Get some permanent objects
 	 *
 	 * @param array $options The options used to get the permanents object
@@ -779,7 +789,8 @@ abstract class PermanentObject {
 	 */
 	public static function get($options = null) {
 		if( $options === null ) {
-			return SQLRequest::select(static::getSQLAdapter(), static::$IDFIELD, static::getClass())->from(static::$table)->asObjectList();
+			/** @noinspection PhpIncompatibleReturnTypeInspection */
+			return static::select();
 		}
 		if( $options instanceof SQLSelectRequest ) {
 			$options->setSQLAdapter(static::getSQLAdapter());
