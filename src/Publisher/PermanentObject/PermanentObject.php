@@ -298,6 +298,29 @@ abstract class PermanentObject {
 	}
 	
 	/**
+	 * Callback when validating update
+	 *
+	 * @param array $input
+	 * @param int $newErrors
+	 * @return boolean
+	 */
+	public static function onValidUpdate(&$input, $newErrors) {
+		// Don't care about some errors, other fields should be updated.
+		$found = 0;
+		foreach( $input as $fieldname => $fieldvalue ) {
+			if( in_array($fieldname, static::$fields) ) {
+				$found++;
+			}
+		}
+		if( $found ) {
+			static::fillLogEvent($input, 'edit');
+			static::fillLogEvent($input, 'update');
+		}
+		return $found ? true : false;
+	}
+	
+	
+	/**
 	 * Extract an update query from this object
 	 *
 	 * @param array $input
