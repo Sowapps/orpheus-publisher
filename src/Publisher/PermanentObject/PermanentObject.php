@@ -812,7 +812,7 @@ abstract class PermanentObject {
 	 * @param    mixed|mixed[] $in The object ID to load or a valid array of the object's data
 	 * @param    boolean $nullable True to silent errors row and return null
 	 * @param    boolean $usingCache True to cache load and set cache, false to not cache
-	 * @return    PermanentObject The object
+	 * @return   static The object loaded from database
 	 * @see static::get()
 	 *
 	 * Loads the object with the ID $id or the array data.
