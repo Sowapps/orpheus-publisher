@@ -6,35 +6,34 @@
 namespace Orpheus\Publisher\Transaction;
 
 use Orpheus\SQLAdapter\SQLAdapter;
-use Orpheus\Publisher\PermanentObject\PermanentObject;
 
 /**
  * The Transaction Object Set class
- * 
+ *
  * This class is about a transaction with multiple operation for an adapter
- * 
+ *
  * @author Florent Hazard <contact@sowapps.com>
  *
  */
 class TransactionOperationSet implements \IteratorAggregate {
-
+	
 	/**
 	 * List of operation in this set
-	 * 
+	 *
 	 * @var TransactionOperation[] $operations
 	 */
-	protected $operations	= array();
+	protected $operations = [];
 	
 	/**
 	 * The SQL Adapter to use
-	 * 
+	 *
 	 * @var SQLAdapter $sqlAdapter
 	 */
 	protected $sqlAdapter;
 	
 	/**
 	 * Constructor
-	 * 
+	 *
 	 * @param SQLAdapter $sqlAdapter
 	 */
 	public function __construct(SQLAdapter $sqlAdapter) {
@@ -43,7 +42,7 @@ class TransactionOperationSet implements \IteratorAggregate {
 	
 	/**
 	 * Add an operation to this set
-	 * 
+	 *
 	 * @param TransactionOperation $operation
 	 */
 	public function add(TransactionOperation $operation) {
@@ -52,7 +51,7 @@ class TransactionOperationSet implements \IteratorAggregate {
 	
 	/**
 	 * Get the SQL Adapter
-	 * 
+	 *
 	 * @return \Orpheus\SQLAdapter\SQLAdapter
 	 */
 	public function getSQLAdapter() {
@@ -76,7 +75,7 @@ class TransactionOperationSet implements \IteratorAggregate {
 	 * Validate operations, before applying
 	 */
 	protected function validateOperations() {
-		$errors	= 0;
+		$errors = 0;
 		foreach( $this->operations as $operation ) {
 			$operation->setTransactionOperationSet($this);
 			$operation->validate($errors);
@@ -94,7 +93,7 @@ class TransactionOperationSet implements \IteratorAggregate {
 	}
 	
 	/**
-	 * 
+	 *
 	 * {@inheritDoc}
 	 * @see IteratorAggregate::getIterator()
 	 */

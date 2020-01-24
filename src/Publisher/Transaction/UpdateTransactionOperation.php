@@ -18,28 +18,28 @@ class UpdateTransactionOperation extends TransactionOperation {
 	
 	/**
 	 * The data to insert
-	 * 
+	 *
 	 * @var array
 	 */
 	protected $data;
 	
 	/**
 	 * Fields to restrict creation
-	 * 
+	 *
 	 * @var string[]
 	 */
 	protected $fields;
 	
 	/**
 	 * The object of this operation
-	 * 
+	 *
 	 * @var PermanentObject
 	 */
 	protected $object;
 	
 	/**
 	 * Constructor
-	 * 
+	 *
 	 * @param string $class
 	 * @param array $data
 	 * @param string[] $fields
@@ -47,30 +47,30 @@ class UpdateTransactionOperation extends TransactionOperation {
 	 */
 	public function __construct($class, array $data, $fields, PermanentObject $object) {
 		parent::__construct($class);
-		$this->data		= $data;
-		$this->fields	= $fields;
-		$this->object	= $object;
+		$this->data = $data;
+		$this->fields = $fields;
+		$this->object = $object;
 	}
-
+	
 	/**
 	 *
 	 * {@inheritDoc}
-	 * @see \Orpheus\Publisher\Transaction\TransactionOperation::validate()
 	 * @param array $errors
+	 * @see \Orpheus\Publisher\Transaction\TransactionOperation::validate()
 	 */
-	public function validate(&$errors=0) {
+	public function validate(&$errors = 0) {
 		$class = $this->class;
 		$newErrors = 0;
 		
 		$this->data = $class::checkUserInput($this->data, $this->fields, $this->object, $newErrors);
-	
+		
 		$this->setIsValid($class::onValidUpdate($this->data, $newErrors));
 		
-		$errors	+= $newErrors;
+		$errors += $newErrors;
 	}
 	
 	/**
-	 * 
+	 *
 	 * {@inheritDoc}
 	 * @see \Orpheus\Publisher\Transaction\TransactionOperation::run()
 	 */
@@ -78,9 +78,9 @@ class UpdateTransactionOperation extends TransactionOperation {
 		// TODO : Use a SQLUpdateRequest class
 		$class = $this->class;
 		$queryOptions = $class::extractUpdateQuery($this->data, $this->object);
-
-		$sqlAdapter	= $this->getSQLAdapter();
-	
+		
+		$sqlAdapter = $this->getSQLAdapter();
+		
 		$r = $sqlAdapter->update($queryOptions);
 		if( $r ) {
 			// Success

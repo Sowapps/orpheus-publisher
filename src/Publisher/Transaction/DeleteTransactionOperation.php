@@ -18,34 +18,34 @@ class DeleteTransactionOperation extends TransactionOperation {
 	
 	/**
 	 * The object of this operation
-	 * 
+	 *
 	 * @var PermanentObject
 	 */
 	protected $object;
 	
 	/**
 	 * Constructor
-	 * 
+	 *
 	 * @param string $class
 	 * @param PermanentObject $object
 	 */
 	public function __construct($class, PermanentObject $object) {
 		parent::__construct($class);
-		$this->object	= $object;
+		$this->object = $object;
 	}
 	
 	/**
-	 * 
+	 *
 	 * {@inheritDoc}
-	 * @see \Orpheus\Publisher\Transaction\TransactionOperation::validate()
 	 * @param array $errors
+	 * @see \Orpheus\Publisher\Transaction\TransactionOperation::validate()
 	 */
-	public function validate(&$errors=0) {
+	public function validate(&$errors = 0) {
 		$this->setIsValid(!$this->object->isDeleted());
 	}
 	
 	/**
-	 * 
+	 *
 	 * {@inheritDoc}
 	 * @see \Orpheus\Publisher\Transaction\TransactionOperation::run()
 	 */
@@ -53,21 +53,21 @@ class DeleteTransactionOperation extends TransactionOperation {
 		// Testing generating query in this class
 		$class = $this->class;
 		
-		$options	= array(
-			'table'		=> $class::getTable(),
-			'where'		=> $class::getIDField().'='.$this->object->id(),
-			'number'	=> 1,
-		);
+		$options = [
+			'table'  => $class::getTable(),
+			'where'  => $class::getIDField() . '=' . $this->object->id(),
+			'number' => 1,
+		];
 		
-		$sqlAdapter	= $this->getSQLAdapter();
+		$sqlAdapter = $this->getSQLAdapter();
 		
 		$r = $sqlAdapter->delete($options);
-// 		$r = SQLAdapter::doDelete($options, static::$DBInstance, static::$IDFIELD);
+		// 		$r = SQLAdapter::doDelete($options, static::$DBInstance, static::$IDFIELD);
 		if( $r ) {
 			// Success
 			$this->object->markAsDeleted();
 			return 1;
-// 			static::runForDeletion($in);
+			// 			static::runForDeletion($in);
 		}
 		return 0;
 		

@@ -16,59 +16,59 @@ class CreateTransactionOperation extends TransactionOperation {
 	
 	/**
 	 * The data to insert
-	 * 
+	 *
 	 * @var array
 	 */
 	protected $data;
 	
 	/**
 	 * Fields to restrict creation
-	 * 
+	 *
 	 * @var string[]
 	 */
 	protected $fields;
 	
 	/**
 	 * The resulting ID after inserted data
-	 * 
+	 *
 	 * @var string
 	 */
 	protected $insertID;
 	
 	/**
 	 * Constructor
-	 * 
+	 *
 	 * @param string $class
 	 * @param array $data
 	 * @param string[] $fields
 	 */
 	public function __construct($class, array $data, $fields) {
 		parent::__construct($class);
-		$this->data		= $data;
-		$this->fields	= $fields;
+		$this->data = $data;
+		$this->fields = $fields;
 	}
 	
 	/**
-	 * 
+	 *
 	 * {@inheritDoc}
-	 * @see \Orpheus\Publisher\Transaction\TransactionOperation::validate()
 	 * @param array $errors
+	 * @see \Orpheus\Publisher\Transaction\TransactionOperation::validate()
 	 */
-	public function validate(&$errors=0) {
+	public function validate(&$errors = 0) {
 		$class = $this->class;
-// 		$class::checkUserInput($input, $fields, $this, $errCount);
+		// 		$class::checkUserInput($input, $fields, $this, $errCount);
 		$newErrors = 0;
 		$this->data = $class::checkUserInput($this->data, $this->fields, null, $newErrors);
 		
 		$class::onValidCreate($this->data, $newErrors);
 		
-		$errors	+= $newErrors;
+		$errors += $newErrors;
 		
 		$this->setValid();
 	}
 	
 	/**
-	 * 
+	 *
 	 * {@inheritDoc}
 	 * @see \Orpheus\Publisher\Transaction\TransactionOperation::run()
 	 */
@@ -76,8 +76,8 @@ class CreateTransactionOperation extends TransactionOperation {
 		// TODO : Use an SQLCreateRequest class
 		$class = $this->class;
 		$queryOptions = $class::extractCreateQuery($this->data);
-
-		$sqlAdapter	= $this->getSQLAdapter();
+		
+		$sqlAdapter = $this->getSQLAdapter();
 		
 		$r = $sqlAdapter->insert($queryOptions);
 		
@@ -93,7 +93,7 @@ class CreateTransactionOperation extends TransactionOperation {
 	
 	/**
 	 * Get the last inserted data's id
-	 * 
+	 *
 	 * @return string
 	 */
 	public function getInsertID() {
