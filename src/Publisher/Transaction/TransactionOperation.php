@@ -86,7 +86,6 @@ abstract class TransactionOperation {
 	 */
 	public function runIfValid() {
 		return $this->isValid ? $this->run() : 0;
-		// 		return $this->isValid ? $this->run() : null;
 	}
 	
 	/**

@@ -81,6 +81,7 @@ class UpdateTransactionOperation extends TransactionOperation {
 		
 		$sqlAdapter = $this->getSQLAdapter();
 		
+		$queryOptions['idField'] = $this->object::getIDField();
 		$r = $sqlAdapter->update($queryOptions);
 		if( $r ) {
 			// Success
