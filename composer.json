@@ -17,13 +17,13 @@
 		]
 	},
 	"require" : {
-		"orpheus/orpheus-core" : "dev-master",
-		"orpheus/orpheus-hook" : "dev-master",
-		"orpheus/orpheus-cache" : "dev-master",
-		"orpheus/orpheus-sqladapter" : "dev-master",
-		"orpheus/orpheus-yaml" : "dev-master",
-		"orpheus/orpheus-rendering" : "dev-master",
-		"orpheus/orpheus-inputcontroller" : "dev-master"
+	  "orpheus/orpheus-core": "1.*",
+	  "orpheus/orpheus-hook": "1.*",
+	  "orpheus/orpheus-cache": "1.*",
+	  "orpheus/orpheus-sqladapter": "1.*",
+	  "orpheus/orpheus-yaml": "1.*",
+	  "orpheus/orpheus-rendering": "1.*",
+	  "orpheus/orpheus-inputcontroller": "1.*"
 	},
 	"type" : "library",
 	"license" : "MIT",
