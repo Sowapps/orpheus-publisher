@@ -30,7 +30,7 @@ Hook::register(HOOK_SESSIONSTARTED, function () {
 	// No more in Orpheus, each page should specify the acces required right in routes.yaml
 	$GLOBALS['RIGHTS'] = IniConfig::build('rights', true);
 	
-	if( User::isLogged() ) {
+	if( AbstractUser::isLogged() ) {
 		//global $USER;// Do not work in this context.
 		/* @var User $USER */
 		$USER = $GLOBALS['USER'] = &$_SESSION['USER'];
@@ -55,7 +55,7 @@ Hook::register(HOOK_SESSIONSTARTED, function () {
  *
  * @param int|string|PermanentObject $id
  * @return int
- * @see \Orpheus\Publisher\PermanentObject\PermanentObject::object()
+ * @see PermanentObject::object()
  */
 function id(&$id) {
 	return $id = intval(is_object($id) ? $id->id() : $id);
