@@ -143,7 +143,7 @@ abstract class PermanentObject {
 			} else {
 				$fieldValue = $data[$fieldname];
 			}
-			$this->data[$fieldname] = $this->parseFieldValue($fieldname, $fieldValue);
+			$this->data[$fieldname] = $this->parseFieldSqlValue($fieldname, $fieldValue);
 		}
 		$this->clearModifiedFields();
 		if( defined('DEV_VERSION') && DEV_VERSION ) {
@@ -168,9 +168,9 @@ abstract class PermanentObject {
 	 * @param string $name The field name to parse
 	 * @param string $value The field value to parse
 	 * @return string The parse $value
-	 * @see PermanentObject::formatFieldValue()
+	 * @see PermanentObject::formatFieldSqlValue()
 	 */
-	protected static function parseFieldValue($name, $value) {
+	protected static function parseFieldSqlValue($name, $value) {
 		return $value;
 	}
 	
@@ -237,7 +237,7 @@ abstract class PermanentObject {
 				$this->save();
 			} catch( Exception $e ) {
 				// Can be destructed outside of the matrix
-				log_error($e->getMessage() . "<br />\n" . $e->getTraceAsString(), 'PermanentObject::__destruct(): Saving');
+				log_error($e, 'PermanentObject::__destruct(): Saving');
 			}
 		}
 	}
@@ -261,7 +261,6 @@ abstract class PermanentObject {
 		}
 		$operation = $this->getUpdateOperation($data, $this->modFields);
 		// Do not validate, new data are invalid due to the fact the new data are already in object
-		// 		$operation->validate();
 		$r = $operation->run();
 		$this->modFields = [];
 		if( !$this->onSavedInProgress ) {
@@ -376,28 +375,22 @@ abstract class PermanentObject {
 	 * Set the field $key with the new $value.
 	 */
 	public function setValue($key, $value) {
-		if( !isset($key) ) {
+		if( $key === null ) {
 			// Invalid key
 			throw new Exception("nullKey");
 			
-		} else {
-			if( !in_array($key, static::$fields) ) {
-				// Unknown key
-				throw new FieldNotFoundException($key, static::getClass());
-				
-			} else {
-				if( $key === static::$IDFIELD ) {
-					// ID is not editable
-					throw new Exception("idNotEditable");
-					
-				} else {
-					if( $value !== $this->data[$key] ) {
-						// The value is different
-						$this->addModFields($key);
-						$this->data[$key] = $value;
-					}
-				}
-			}
+		} elseif( !in_array($key, static::$fields) ) {
+			// Unknown key
+			throw new FieldNotFoundException($key, static::getClass());
+			
+		} elseif( $key === static::$IDFIELD ) {
+			// ID is not editable
+			throw new Exception("idNotEditable");
+			
+		} elseif( $value !== $this->data[$key] ) {
+			// The value is different
+			$this->addModFields($key);
+			$this->data[$key] = $value;
 		}
 		return $this;
 	}
@@ -673,7 +666,7 @@ abstract class PermanentObject {
 	 * @param mixed|mixed[] $in The object ID to load or a valid array of the object's data
 	 * @param boolean $nullable True to silent errors row and return null
 	 * @param boolean $usingCache True to cache load and set cache, false to not cache
-	 * @return   static The object loaded from database
+	 * @return static The object loaded from database
 	 * @throws NotFoundException
 	 * @throws UserException
 	 * @throws Exception
@@ -723,7 +716,7 @@ abstract class PermanentObject {
 				static::throwNotFound();
 			}
 		} else {
-			$obj = new static($data);
+			$obj = static::instantiate($data);
 		}
 		// Caching object
 		return $usingCache ? $obj->checkCache() : $obj;
@@ -764,6 +757,16 @@ abstract class PermanentObject {
 	 */
 	public static function throwException($message) {
 		throw new UserException($message, static::getDomain());
+	}
+	
+	/**
+	 * Instanciate object from data, allowing you to instanciate child class
+	 *
+	 * @param $data
+	 * @return static
+	 */
+	protected static function instantiate($data) {
+		return new static($data);
 	}
 	
 	// *** STATIC METHODS ***
@@ -833,7 +836,7 @@ abstract class PermanentObject {
 		if( in_array($event . '_time', static::$fields) ) {
 			$this->setValue($event . '_time', $log[$event . '_time']);
 		} elseif( in_array($event . '_date', static::$fields) ) {
-			$this->setValue($event . '_date', sqlDatetime($log[$event . '_time']));
+			$this->setValue($event . '_date', static::now($log[$event . '_time']));
 		} else {
 			return;
 		}
@@ -864,9 +867,13 @@ abstract class PermanentObject {
 	public static function getLogEvent($event, $time = null, $ipAdd = null) {
 		return [
 			$event . '_time' => isset($time) ? $time : time(),
-			$event . '_date' => isset($time) ? sqlDatetime($time) : sqlDatetime(),
+			$event . '_date' => isset($time) ? static::now($time) : static::now(),
 			$event . '_ip'   => isset($ipAdd) ? $ipAdd : (!empty($_SERVER['REMOTE_ADDR']) ? $_SERVER['REMOTE_ADDR'] : '127.0.0.1'),
 		];
+	}
+	
+	protected static function now($time = null) {
+		return sqlDatetime($time);
 	}
 	
 	public function asArray($model = self::OUTPUT_MODEL_ALL) {
@@ -941,7 +948,9 @@ abstract class PermanentObject {
 		if( in_array($event . '_time', static::$fields) ) {
 			$array[$event . '_time'] = time();
 		} elseif( in_array($event . '_date', static::$fields) ) {
-			$array[$event . '_date'] = sqlDatetime();
+			if( !isset($array[$event . '_date']) ) {
+				$array[$event . '_date'] = static::now();
+			}
 		} else {
 			// Date or time is mandatory
 			return;
@@ -1495,7 +1504,7 @@ abstract class PermanentObject {
 	 * @deprecated Prefer to use parseFieldValue(), Adapter should format the data
 	 * @see PermanentObject::formatValue()
 	 */
-	protected static function formatFieldValue($name, $value) {
+	protected static function formatFieldSqlValue($name, $value) {
 		return $value;
 	}
 }

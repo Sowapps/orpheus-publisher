@@ -5,6 +5,8 @@
 
 namespace Orpheus\Publisher\Transaction;
 
+use Orpheus\Publisher\PermanentObject\PermanentObject;
+
 /**
  * The CreateTransactionOperation class
  *
@@ -52,11 +54,12 @@ class CreateTransactionOperation extends TransactionOperation {
 	 *
 	 * {@inheritDoc}
 	 * @param array $errors
-	 * @see \Orpheus\Publisher\Transaction\TransactionOperation::validate()
+	 * @see TransactionOperation::validate()
 	 */
 	public function validate(&$errors = 0) {
+		/** @var PermanentObject $class */
 		$class = $this->class;
-		// 		$class::checkUserInput($input, $fields, $this, $errCount);
+		
 		$newErrors = 0;
 		$this->data = $class::checkUserInput($this->data, $this->fields, null, $newErrors);
 		
@@ -70,10 +73,11 @@ class CreateTransactionOperation extends TransactionOperation {
 	/**
 	 *
 	 * {@inheritDoc}
-	 * @see \Orpheus\Publisher\Transaction\TransactionOperation::run()
+	 * @see TransactionOperation::run()
 	 */
 	public function run() {
-		// TODO : Use an SQLCreateRequest class
+		// TODO : Use a SQLCreateRequest class
+		/** @var PermanentObject $class */
 		$class = $this->class;
 		$queryOptions = $class::extractCreateQuery($this->data);
 		
