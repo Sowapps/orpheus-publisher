@@ -32,21 +32,15 @@ Hook::register(HOOK_SESSIONSTARTED, function () {
 	
 	if( AbstractUser::isLogged() ) {
 		//global $USER;// Do not work in this context.
-		/* @var User $USER */
-		$USER = $GLOBALS['USER'] = &$_SESSION['USER'];
-		if( !$USER->reload() ) {
-			// User does not exist anymore
-			$USER->logout();
-		}
-		$USER->onConnected();
+		$user = AbstractUser::getLoggedUser();
 		
 		// If login ip is different from current one, protect against cookie stealing
-		if( Config::get('deny_multiple_connections', false) && !$USER->isLogin(AbstractUser::LOGGED_FORCED) && $USER->login_ip != $_SERVER['REMOTE_ADDR'] ) {
-			$USER->logout('loggedFromAnotherComputer');
+		if( Config::get('deny_multiple_connections', false) && !$user->isLogin(AbstractUser::LOGGED_FORCED) && $user->login_ip !== $_SERVER['REMOTE_ADDR'] ) {
+			$user->logout('loggedFromAnotherComputer');
 			return;
 		}
 	} elseif( isset($_SERVER['PHP_AUTH_USER']) && Config::get('httpauth_enabled') ) {
-		User::httpAuthenticate();
+		AbstractUser::httpAuthenticate();
 	}
 });
 

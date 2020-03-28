@@ -9,6 +9,7 @@
 
 namespace Orpheus\Publisher\PermanentObject;
 
+use DateTime;
 use Exception;
 use Orpheus\Exception\NotFoundException;
 use Orpheus\Exception\UserException;
@@ -760,16 +761,32 @@ abstract class PermanentObject {
 	}
 	
 	/**
-	 * Instanciate object from data, allowing you to instanciate child class
+	 * Instantiate object from data, allowing you to instantiate child class
 	 *
 	 * @param $data
 	 * @return static
+	 * @throws Exception
 	 */
 	protected static function instantiate($data) {
 		return new static($data);
 	}
 	
-	// *** STATIC METHODS ***
+	/**
+	 * Get data with an exportable format.
+	 * We recommend to filter only data you need using $filterKeys
+	 *
+	 * @param string[]|null $filterKeys The key to filter, else all
+	 * @return array
+	 */
+	protected function getExportData($filterKeys = null) {
+		$data = $filterKeys ? array_filterbykeys($this->data, $filterKeys) : $this->data;
+		foreach( $data as $key => &$value ) {
+			if( $value instanceof DateTime ) {
+				$value = $value->format(DateTime::W3C);
+			}
+		}
+		return $data;
+	}
 	
 	/**
 	 * Check if this object is cached and cache it
