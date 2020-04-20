@@ -11,6 +11,7 @@ namespace Orpheus\Publisher\PermanentObject;
 
 use DateTime;
 use Exception;
+use Orpheus\EntityDescriptor\Exception\DuplicateException;
 use Orpheus\Exception\NotFoundException;
 use Orpheus\Exception\UserException;
 use Orpheus\Publisher\Exception\FieldNotFoundException;
@@ -1358,19 +1359,18 @@ abstract class PermanentObject {
 	}
 	
 	/**
-	 * Check user input
+	 * Check if the class could generate a valid object from $input.
+	 * The method could modify the user input to fix them but it must return the data.
+	 * The data are passed through the validator, for different cases:
+	 * - If empty, this function return an empty array.
+	 * - If an array, it uses an field => checkMethod association.
 	 *
 	 * @param array $input The user input data to check.
 	 * @param string[] $fields The array of fields to check. Default value is null.
 	 * @param PermanentObject $ref The referenced object (update only). Default value is null.
 	 * @param int $errCount The resulting error count, as pointer. Output parameter.
 	 * @return array The valid data.
-	 *
-	 * Check if the class could generate a valid object from $input.
-	 * The method could modify the user input to fix them but it must return the data.
-	 * The data are passed through the validator, for different cases:
-	 * - If empty, this function return an empty array.
-	 * - If an array, it uses an field => checkMethod association.
+	 * @throws DuplicateException
 	 */
 	public static function checkUserInput($input, $fields = null, $ref = null, &$errCount = 0) {
 		if( !isset($errCount) ) {
