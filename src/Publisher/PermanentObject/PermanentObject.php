@@ -100,6 +100,14 @@ abstract class PermanentObject {
 	 * @var array
 	 */
 	protected static $knownClassData = [];
+	
+	/**
+	 * Should check fields integrity when load one element ?
+	 *
+	 * @var bool
+	 */
+	protected static bool $checkFieldIntegrity = ENTITY_CLASS_CHECK;
+	
 	/**
 	 * Currently modified fields
 	 *
@@ -139,7 +147,8 @@ abstract class PermanentObject {
 			if( !array_key_exists($fieldname, $data) ) {
 				// Data not found but should be, this object is out of date
 				// Data not in DB, this class is invalid
-				if( !defined('ENTITY_CLASS_CHECK') || ENTITY_CLASS_CHECK ) {
+				// Disable $checkFieldIntegrity if you want to mock up this entity
+				if( static::$checkFieldIntegrity ) {
 					throw new Exception('The class ' . static::getClass() . ' is out of date, the field "' . $fieldname . '" is unknown in database.');
 				}
 			} else {
@@ -317,7 +326,7 @@ abstract class PermanentObject {
 	/**
 	 * Get all gathered data about this class
 	 *
-	 * @param array $classData
+	 * @param array|null $classData
 	 * @return array
 	 */
 	public static function getClassData(&$classData = null) {
@@ -1524,6 +1533,14 @@ abstract class PermanentObject {
 	protected static function formatFieldSqlValue($name, $value) {
 		return $value;
 	}
+	
+	/**
+	 * @param bool $checkFieldIntegrity
+	 */
+	public static function setCheckFieldIntegrity(bool $checkFieldIntegrity): void {
+		self::$checkFieldIntegrity = $checkFieldIntegrity;
+	}
+	
 }
 
 PermanentObject::selfInit();

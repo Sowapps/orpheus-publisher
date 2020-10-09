@@ -15,6 +15,7 @@ if( !defined('ORPHEUSPATH') ) {
 }
 
 defifn('CHECK_MODULE_ACCESS', true);
+defifn('ENTITY_CLASS_CHECK', true);
 
 // Hooks
 define('HOOK_ACCESSDENIED', 'accessDenied');
@@ -27,7 +28,7 @@ Hook::create(HOOK_ACCESSDENIED);
  * HOOK_CHECKMODULE is called before session is initialized
  */
 Hook::register(HOOK_SESSIONSTARTED, function () {
-	// No more in Orpheus, each page should specify the acces required right in routes.yaml
+	// RIGHTS is no more used in Orpheus, each page should specifies the access restrictions in routes.yaml
 	$GLOBALS['RIGHTS'] = IniConfig::build('rights', true);
 	
 	if( AbstractUser::isLogged() ) {
@@ -35,7 +36,7 @@ Hook::register(HOOK_SESSIONSTARTED, function () {
 		$user = AbstractUser::getLoggedUser();
 		
 		// If login ip is different from current one, protect against cookie stealing
-		if( Config::get('deny_multiple_connections', false) && !$user->isLogin(AbstractUser::LOGGED_FORCED) && $user->login_ip !== $_SERVER['REMOTE_ADDR'] ) {
+		if( Config::get('deny_multiple_connections', false) && !$user->isLogin(AbstractUser::LOGGED_FORCED) && $user->login_ip !== clientIP() ) {
 			$user->logout('loggedFromAnotherComputer');
 			return;
 		}
