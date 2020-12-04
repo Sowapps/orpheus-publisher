@@ -118,7 +118,7 @@ class InvalidFieldException extends UserException {
 	 * @return string
 	 */
 	public function getKey() {
-		return $this->field . '_' . $this->getMessage();
+		return $this->key;
 	}
 	
 	/**

@@ -557,8 +557,8 @@ abstract class PermanentObject {
 	 * Also it removes the reloaded fields from the modified ones list.
 	 */
 	public function reload($field = null) {
-		$IDFIELD = static::getIDField();
-		$options = ['where' => $IDFIELD . '=' . $this->$IDFIELD, 'output' => SQLAdapter::ARR_FIRST];
+		$idField = static::getIDField();
+		$options = ['where' => $idField . '=' . $this->$idField, 'output' => SQLAdapter::ARR_FIRST];
 		if( $field ) {
 			if( !in_array($field, static::$fields) ) {
 				throw new FieldNotFoundException($field, static::getClass());
@@ -1010,10 +1010,11 @@ abstract class PermanentObject {
 				unset($input[$fieldName]);
 			}
 		}
+		$idField = static::getIDField();
 		return [
 			'what'   => $input,
 			'table'  => static::$table,
-			'where'  => static::getIDField() . '=' . $object->id(),
+			'where'  => $idField . '=' . $object->$idField,
 			'number' => 1,
 		];
 	}
@@ -1341,19 +1342,20 @@ abstract class PermanentObject {
 	
 	/**
 	 * Test user input
+	 * Do a checkUserInput() and a checkForObject()
 	 *
 	 * @param array $input The new data to process.
-	 * @param array $fields The array of fields to check. Default value is null.
+	 * @param array|null $fields The array of fields to check. Default value is null.
 	 * @param PermanentObject|null $ref The referenced object (update only). Default value is null.
 	 * @param int $errCount The resulting error count, as pointer. Output parameter.
+	 * @param array|bool $ignoreRequired
 	 * @return bool
+	 * @throws DuplicateException
 	 * @see create()
 	 * @see checkUserInput()
-	 *
-	 * Does a checkUserInput() and a checkForObject()
 	 */
-	public static function testUserInput($input, $fields = null, $ref = null, &$errCount = 0) {
-		$data = static::checkUserInput($input, $fields, $ref, $errCount);
+	public static function testUserInput($input, $fields = null, $ref = null, &$errCount = 0, $ignoreRequired = false) {
+		$data = static::checkUserInput($input, $fields, $ref, $errCount, $ignoreRequired);
 		if( $errCount ) {
 			return false;
 		}
@@ -1381,7 +1383,7 @@ abstract class PermanentObject {
 	 * @return array The valid data.
 	 * @throws DuplicateException
 	 */
-	public static function checkUserInput($input, $fields = null, $ref = null, &$errCount = 0) {
+	public static function checkUserInput($input, $fields = null, $ref = null, &$errCount = 0, $ignoreRequired = false) {
 		if( !isset($errCount) ) {
 			$errCount = 0;
 		}
@@ -1435,7 +1437,7 @@ abstract class PermanentObject {
 			return $data;
 			
 		} elseif( is_object(static::$validator) && method_exists(static::$validator, 'validate') ) {
-			return static::$validator->validate($input, $fields, $ref, $errCount);
+			return static::$validator->validate($input, $fields, $ref, $errCount, $ignoreRequired);
 		}
 		return [];
 	}
