@@ -11,6 +11,7 @@ namespace Orpheus\Publisher\PermanentObject;
 
 use DateTime;
 use Exception;
+use Orpheus\EntityDescriptor\EntityDescriptor;
 use Orpheus\EntityDescriptor\Exception\DuplicateException;
 use Orpheus\Exception\NotFoundException;
 use Orpheus\Exception\UserException;
@@ -23,7 +24,6 @@ use Orpheus\SQLAdapter\Exception\SQLException;
 use Orpheus\SQLAdapter\SQLAdapter;
 use Orpheus\SQLRequest\SQLRequest;
 use Orpheus\SQLRequest\SQLSelectRequest;
-
 
 /**
  * The permanent object class
@@ -537,7 +537,7 @@ abstract class PermanentObject {
 	/**
 	 * Get the delete operation for this object
 	 *
-	 * @return \Orpheus\Publisher\Transaction\DeleteTransactionOperation
+	 * @return DeleteTransactionOperation
 	 */
 	public function getDeleteOperation() {
 		$operation = new DeleteTransactionOperation(static::getClass(), $this);
@@ -563,7 +563,7 @@ abstract class PermanentObject {
 			if( !in_array($field, static::$fields) ) {
 				throw new FieldNotFoundException($field, static::getClass());
 			}
-			$i = array_search($this->modFields, $field);
+			$i = array_search($field, $this->modFields);
 			if( $i !== false ) {
 				unset($this->modFields[$i]);
 			}
@@ -697,10 +697,10 @@ abstract class PermanentObject {
 		if( is_object($in) && $in instanceof static ) {
 			return $in;
 		}
-		$IDFIELD = static::$IDFIELD;
+		$idField = static::$IDFIELD;
 		// If $in is an array, we trust him, as data of the object.
 		if( is_array($in) ) {
-			$id = $in[$IDFIELD];
+			$id = $in[$idField];
 			$data = $in;
 		} else {
 			$id = $in;
@@ -716,7 +716,7 @@ abstract class PermanentObject {
 		if( empty($data) ) {
 			// Getting data
 			$obj = static::get()
-				->where($IDFIELD, '=', $id)
+				->where($idField, '=', $id)
 				->asObject()
 				->run();
 			// Ho no, we don't have the data, we can't load the object !
@@ -1437,7 +1437,10 @@ abstract class PermanentObject {
 			return $data;
 			
 		} elseif( is_object(static::$validator) && method_exists(static::$validator, 'validate') ) {
-			return static::$validator->validate($input, $fields, $ref, $errCount, $ignoreRequired);
+			/** @var EntityDescriptor $validator */
+			$validator = static::$validator;
+			
+			return $validator->validate($input, $fields, $ref, $errCount, $ignoreRequired);
 		}
 		return [];
 	}
@@ -1447,11 +1450,12 @@ abstract class PermanentObject {
 	 *
 	 * @param array $data The new data to process.
 	 * @param PermanentObject|null $ref The referenced object (update only). Default value is null.
-	 * @see create()
-	 * @see update()
+	 * @throws UserException
 	 *
 	 * This function is called by create() after checking user input data and before running for them.
 	 * In the base class, this method does nothing.
+	 * @see update()
+	 * @see create()
 	 */
 	public static function checkForObject($data, $ref = null) {
 	}
@@ -1465,6 +1469,7 @@ abstract class PermanentObject {
 	 */
 	public static function init($isFinal = true) {
 		
+		/** @var PermanentObject $parent */
 		$parent = get_parent_class(get_called_class());
 		if( empty($parent) ) {
 			return;

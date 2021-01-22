@@ -60,7 +60,7 @@ class InvalidFieldException extends UserException {
 	 * @param array $typeArgs
 	 */
 	public function __construct($key, $field, $value, $type = null, $domain = null, $typeArgs = []) {
-		parent::__construct($key . '_' . $field, $domain);
+		parent::__construct($field . '_' . $key, $domain);
 		$this->key = $key;
 		$this->field = $field;
 		$this->type = $type;
