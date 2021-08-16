@@ -62,12 +62,10 @@ class DeleteTransactionOperation extends TransactionOperation {
 		$sqlAdapter = $this->getSQLAdapter();
 		
 		$r = $sqlAdapter->delete($options);
-		// 		$r = SQLAdapter::doDelete($options, static::$DBInstance, static::$IDFIELD);
 		if( $r ) {
 			// Success
 			$this->object->markAsDeleted();
 			return 1;
-			// 			static::runForDeletion($in);
 		}
 		return 0;
 		

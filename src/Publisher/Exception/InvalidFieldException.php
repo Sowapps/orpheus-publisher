@@ -19,35 +19,35 @@ class InvalidFieldException extends UserException {
 	 *
 	 * @var string
 	 */
-	protected $key;
+	protected string $key;
 	
 	/**
 	 * The type
 	 *
-	 * @var string
+	 * @var string|null
 	 */
-	protected $type;
+	protected ?string $type;
 	
 	/**
 	 * The input field name
 	 *
 	 * @var string
 	 */
-	protected $field;
+	protected string $field;
 	
 	/**
 	 * The value that is not valid
 	 *
 	 * @var string
 	 */
-	protected $value;
+	protected string $value;
 	
 	/**
 	 * The arguments of this check
 	 *
 	 * @var array
 	 */
-	protected $args;
+	protected array $args;
 	
 	/**
 	 * Constructor
@@ -57,9 +57,9 @@ class InvalidFieldException extends UserException {
 	 * @param string $value
 	 * @param string $type
 	 * @param string $domain
-	 * @param array $typeArgs
+	 * @param array|object|mixed $typeArgs
 	 */
-	public function __construct($key, $field, $value, $type = null, $domain = null, $typeArgs = []) {
+	public function __construct(string $key, string $field, string $value, $type = null, $domain = null, $typeArgs = []) {
 		parent::__construct($field . '_' . $key, $domain);
 		$this->key = $key;
 		$this->field = $field;
@@ -73,7 +73,7 @@ class InvalidFieldException extends UserException {
 	 *
 	 * @return string
 	 */
-	public function getField() {
+	public function getField(): string {
 		return $this->field;
 	}
 	
@@ -82,7 +82,7 @@ class InvalidFieldException extends UserException {
 	 *
 	 * @return string
 	 */
-	public function getType() {
+	public function getType(): ?string {
 		return $this->type;
 	}
 	
@@ -91,7 +91,7 @@ class InvalidFieldException extends UserException {
 	 *
 	 * @return string
 	 */
-	public function getValue() {
+	public function getValue(): string {
 		
 		return $this->value;
 	}
@@ -108,7 +108,7 @@ class InvalidFieldException extends UserException {
 	 *
 	 * @return array
 	 */
-	public function getArgs() {
+	public function getArgs(): array {
 		return $this->args;
 	}
 	
@@ -117,17 +117,8 @@ class InvalidFieldException extends UserException {
 	 *
 	 * @return string
 	 */
-	public function getKey() {
+	public function getKey(): string {
 		return $this->key;
-	}
-	
-	/**
-	 * Get the report from this exception
-	 *
-	 * @return string
-	 */
-	public function getReport() {
-		return [static::getText(), $this->field];
 	}
 	
 	/**
@@ -135,9 +126,10 @@ class InvalidFieldException extends UserException {
 	 *
 	 * @return string The translated message from this exception
 	 */
-	public function getText() {
+	public function getText(): string {
 		$args = $this->args;
 		$msg = $this->getMessage();
+		
 		return t($msg, $this->domain, $args);
 	}
 	
@@ -151,7 +143,7 @@ class InvalidFieldException extends UserException {
 	 * @param array $args
 	 * @return InvalidFieldException
 	 */
-	public static function from(UserException $e, $field, $value, $type = null, $args = []) {
+	public static function from(UserException $e, $field, $value, $type = null, $args = []): InvalidFieldException {
 		return new static($e->getMessage(), $field, $value, $type, $e->getDomain(), $args);
 	}
 }
