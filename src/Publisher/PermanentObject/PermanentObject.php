@@ -1514,9 +1514,9 @@ abstract class PermanentObject {
 	 *
 	 * @param string $name The field name to format
 	 * @param mixed $value The field value to format
-	 * @return string The formatted $Value
+	 * @return mixed The formatted $Value
 	 */
-	protected static function formatFieldSqlValue($name, $value): string {
+	protected static function formatFieldSqlValue($name, $value) {
 		return $value;
 	}
 	
