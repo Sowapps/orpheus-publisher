@@ -24,6 +24,7 @@ use Orpheus\SQLAdapter\Exception\SQLException;
 use Orpheus\SQLAdapter\SQLAdapter;
 use Orpheus\SQLRequest\SQLRequest;
 use Orpheus\SQLRequest\SQLSelectRequest;
+use RuntimeException;
 
 /**
  * The permanent object class
@@ -130,28 +131,34 @@ abstract class PermanentObject {
 	 * @throws Exception
 	 */
 	public function __construct(array $data) {
-		foreach( static::$fields as $fieldname ) {
+		$this->setData($data);
+	}
+	
+	/**
+	 * @param array $data
+	 * @internal Only for load & reload methods
+	 */
+	protected function setData(array $data) {
+		foreach( static::$fields as $fieldName ) {
 			// We consider null as a valid value.
 			$fieldValue = null;
-			if( !array_key_exists($fieldname, $data) ) {
+			if( !array_key_exists($fieldName, $data) ) {
 				// Data not found but should be, this object is out of date
 				// Data not in DB, this class is invalid
 				// Disable $checkFieldIntegrity if you want to mock up this entity
 				if( static::$checkFieldIntegrity ) {
-					throw new Exception('The class ' . static::getClass() . ' is out of date, the field "' . $fieldname . '" is unknown in database.');
+					throw new RuntimeException(sprintf('The class %s is out of date, the field "%s" is unknown in database.', static::getClass(), $fieldName));
 				}
 			} else {
-				$fieldValue = $data[$fieldname];
+				$fieldValue = $data[$fieldName];
 			}
-			$this->data[$fieldname] = $this->parseFieldSqlValue($fieldname, $fieldValue);
+			$this->data[$fieldName] = $this->parseFieldSqlValue($fieldName, $fieldValue);
 		}
 		$this->clearModifiedFields();
 		if( defined('DEV_VERSION') && DEV_VERSION ) {
 			$this->checkIntegrity();
 		}
 	}
-	
-	// *** OVERRIDDEN METHODS ***
 	
 	/**
 	 * Get the name of this class
@@ -534,7 +541,7 @@ abstract class PermanentObject {
 	/**
 	 * Reload fields from database
 	 *
-	 * @param string $field The field to reload, default is null (all fields).
+	 * @param string $fieldName The field to reload, default is null (all fields).
 	 * @return boolean True if done
 	 * @throws FieldNotFoundException
 	 *
@@ -542,18 +549,18 @@ abstract class PermanentObject {
 	 * If $field is not set, it reloads only one field else all fields.
 	 * Also it removes the reloaded fields from the modified ones list.
 	 */
-	public function reload($field = null) {
+	public function reload($fieldName = null) {
 		$idField = static::getIDField();
 		$options = ['where' => $idField . '=' . $this->$idField, 'output' => SQLAdapter::ARR_FIRST];
-		if( $field ) {
-			if( !in_array($field, static::$fields) ) {
-				throw new FieldNotFoundException($field, static::getClass());
+		if( $fieldName ) {
+			if( !in_array($fieldName, static::$fields) ) {
+				throw new FieldNotFoundException($fieldName, static::getClass());
 			}
-			$i = array_search($field, $this->modFields);
+			$i = array_search($fieldName, $this->modFields);
 			if( $i !== false ) {
 				unset($this->modFields[$i]);
 			}
-			$options['what'] = $field;
+			$options['what'] = $fieldName;
 		} else {
 			$this->modFields = [];
 		}
@@ -562,15 +569,17 @@ abstract class PermanentObject {
 		} catch( SQLException $e ) {
 			$data = null;
 		}
-		if( empty($data) ) {
+		if( !$data ) {
 			$this->markAsDeleted();
+			
 			return false;
 		}
-		if( !is_null($field) ) {
-			$this->data[$field] = $data[$field];
+		if( $fieldName ) {
+			$this->data[$fieldName] = $this->parseFieldSqlValue($fieldName, $data[$fieldName]);
 		} else {
-			$this->data = $data;
+			$this->setData($data);
 		}
+		
 		return true;
 	}
 	
