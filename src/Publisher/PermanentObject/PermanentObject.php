@@ -37,6 +37,13 @@ abstract class PermanentObject {
 	const OUTPUT_MODEL_ALL = 'all';
 	
 	/**
+	 * The instance to use, see config file, if null, use default
+	 *
+	 * @var string|null
+	 */
+	protected static ?string $instanceName = null;
+	
+	/**
 	 * The ID field
 	 *
 	 * @var string
@@ -173,11 +180,11 @@ abstract class PermanentObject {
 	 * Parse the value from SQL scalar to PHP type
 	 *
 	 * @param string $name The field name to parse
-	 * @param string $value The field value to parse
-	 * @return string The parse $value
+	 * @param mixed $value The field value to parse
+	 * @return mixed The parsed value
 	 * @see PermanentObject::formatFieldSqlValue()
 	 */
-	protected static function parseFieldSqlValue($name, $value) {
+	protected static function parseFieldSqlValue(string $name, $value) {
 		return $value;
 	}
 	
@@ -313,7 +320,7 @@ abstract class PermanentObject {
 	public static function getSqlAdapter(): SQLAdapter {
 		$classData = static::getClassData();
 		if( !isset($classData->sqlAdapter) || !$classData->sqlAdapter ) {
-			$classData->sqlAdapter = SQLAdapter::getInstance(static::$DBInstance);
+			$classData->sqlAdapter = SQLAdapter::getInstance(static::$instanceName);
 		}
 		
 		return $classData->sqlAdapter;
@@ -1008,8 +1015,8 @@ abstract class PermanentObject {
 		}
 		$idField = static::getIDField();
 		return [
-			'what'   => $input,
 			'table'  => static::$table,
+			'what'   => $input,
 			'where'  => $idField . '=' . $object->$idField,
 			'number' => 1,
 		];
@@ -1182,8 +1189,9 @@ abstract class PermanentObject {
 	 *
 	 * @todo Change to use formatFieldValue($name, $value) ?
 	 */
-	public static function formatValueList(array $list) {
+	public static function formatValueList(array $list): string {
 		$sqlAdapter = static::getSqlAdapter();
+		
 		return $sqlAdapter->formatValueList($list);
 	}
 	
