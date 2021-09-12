@@ -38,9 +38,9 @@ class InvalidFieldException extends UserException {
 	/**
 	 * The value that is not valid
 	 *
-	 * @var string
+	 * @var string|null
 	 */
-	protected string $value;
+	protected ?string $value;
 	
 	/**
 	 * The arguments of this check
@@ -54,12 +54,12 @@ class InvalidFieldException extends UserException {
 	 *
 	 * @param string $key
 	 * @param string $field
-	 * @param string $value
+	 * @param ?string $value
 	 * @param string $type
 	 * @param string $domain
 	 * @param array|object|mixed $typeArgs
 	 */
-	public function __construct(string $key, string $field, string $value, $type = null, $domain = null, $typeArgs = []) {
+	public function __construct(string $key, string $field, ?string $value, $type = null, $domain = null, $typeArgs = []) {
 		parent::__construct($field . '_' . $key, $domain);
 		$this->key = $key;
 		$this->field = $field;
@@ -138,7 +138,7 @@ class InvalidFieldException extends UserException {
 	 *
 	 * @param UserException $e
 	 * @param string $field
-	 * @param string $value
+	 * @param ?string $value
 	 * @param string $type
 	 * @param array $args
 	 * @return InvalidFieldException
