@@ -5,7 +5,7 @@
 
 namespace Orpheus\Publisher\Transaction;
 
-use Orpheus\SQLAdapter\SQLAdapter;
+use Orpheus\SqlAdapter\SqlAdapter;
 
 /**
  * The Transaction Object Set class
@@ -27,16 +27,16 @@ class TransactionOperationSet implements \IteratorAggregate {
 	/**
 	 * The SQL Adapter to use
 	 *
-	 * @var SQLAdapter $sqlAdapter
+	 * @var SqlAdapter $sqlAdapter
 	 */
 	protected $sqlAdapter;
 	
 	/**
 	 * Constructor
 	 *
-	 * @param SQLAdapter $sqlAdapter
+	 * @param SqlAdapter $sqlAdapter
 	 */
-	public function __construct(SQLAdapter $sqlAdapter) {
+	public function __construct(SqlAdapter $sqlAdapter) {
 		$this->sqlAdapter = $sqlAdapter;
 	}
 	
@@ -52,9 +52,9 @@ class TransactionOperationSet implements \IteratorAggregate {
 	/**
 	 * Get the SQL Adapter
 	 *
-	 * @return \Orpheus\SQLAdapter\SQLAdapter
+	 * @return \Orpheus\SqlAdapter\SqlAdapter
 	 */
-	public function getSQLAdapter() {
+	public function getSqlAdapter() {
 		return $this->sqlAdapter;
 	}
 	

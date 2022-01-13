@@ -59,7 +59,7 @@ class DeleteTransactionOperation extends TransactionOperation {
 			'number' => 1,
 		];
 		
-		$sqlAdapter = $this->getSQLAdapter();
+		$sqlAdapter = $this->getSqlAdapter();
 		
 		$r = $sqlAdapter->delete($options);
 		if( $r ) {

@@ -75,11 +75,11 @@ class UpdateTransactionOperation extends TransactionOperation {
 	 * @see \Orpheus\Publisher\Transaction\TransactionOperation::run()
 	 */
 	public function run() {
-		// TODO : Use a SQLUpdateRequest class
+		// TODO : Use a SqlUpdateRequest class
 		$class = $this->class;
 		$queryOptions = $class::extractUpdateQuery($this->data, $this->object);
 		
-		$sqlAdapter = $this->getSQLAdapter();
+		$sqlAdapter = $this->getSqlAdapter();
 		
 		$queryOptions['idField'] = $this->object::getIDField();
 		$r = $sqlAdapter->update($queryOptions);

@@ -76,12 +76,12 @@ class CreateTransactionOperation extends TransactionOperation {
 	 * @see TransactionOperation::run()
 	 */
 	public function run() {
-		// TODO : Use a SQLCreateRequest class
+		// TODO : Use a SqlCreateRequest class
 		/** @var PermanentObject $class */
 		$class = $this->class;
 		$queryOptions = $class::extractCreateQuery($this->data);
 		
-		$sqlAdapter = $this->getSQLAdapter();
+		$sqlAdapter = $this->getSqlAdapter();
 		
 		$r = $sqlAdapter->insert($queryOptions);
 		

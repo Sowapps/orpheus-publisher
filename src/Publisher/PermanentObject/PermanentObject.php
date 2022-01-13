@@ -20,10 +20,10 @@ use Orpheus\Publisher\Exception\InvalidFieldException;
 use Orpheus\Publisher\Transaction\CreateTransactionOperation;
 use Orpheus\Publisher\Transaction\DeleteTransactionOperation;
 use Orpheus\Publisher\Transaction\UpdateTransactionOperation;
-use Orpheus\SQLAdapter\Exception\SQLException;
-use Orpheus\SQLAdapter\SQLAdapter;
-use Orpheus\SQLRequest\SQLRequest;
-use Orpheus\SQLRequest\SQLSelectRequest;
+use Orpheus\SqlAdapter\Exception\SqlException;
+use Orpheus\SqlAdapter\SqlAdapter;
+use Orpheus\SqlRequest\SqlRequest;
+use Orpheus\SqlRequest\SqlSelectRequest;
 use RuntimeException;
 
 /**
@@ -306,7 +306,7 @@ abstract class PermanentObject {
 	 */
 	public function getUpdateOperation($input, $fields) {
 		$operation = new UpdateTransactionOperation(static::getClass(), $input, $fields, $this);
-		$operation->setSQLAdapter(static::getSqlAdapter());
+		$operation->setSqlAdapter(static::getSqlAdapter());
 		
 		return $operation;
 	}
@@ -314,13 +314,13 @@ abstract class PermanentObject {
 	/**
 	 * Get the SQL Adapter of this class
 	 *
-	 * @return SQLAdapter
-	 * @throws SQLException
+	 * @return SqlAdapter
+	 * @throws SqlException
 	 */
-	public static function getSqlAdapter(): SQLAdapter {
+	public static function getSqlAdapter(): SqlAdapter {
 		$classData = static::getClassData();
 		if( !isset($classData->sqlAdapter) || !$classData->sqlAdapter ) {
-			$classData->sqlAdapter = SQLAdapter::getInstance(static::$instanceName);
+			$classData->sqlAdapter = SqlAdapter::getInstance(static::$instanceName);
 		}
 		
 		return $classData->sqlAdapter;
@@ -541,7 +541,7 @@ abstract class PermanentObject {
 	 */
 	public function getDeleteOperation() {
 		$operation = new DeleteTransactionOperation(static::getClass(), $this);
-		$operation->setSQLAdapter(static::getSqlAdapter());
+		$operation->setSqlAdapter(static::getSqlAdapter());
 		return $operation;
 	}
 	
@@ -558,7 +558,7 @@ abstract class PermanentObject {
 	 */
 	public function reload($fieldName = null) {
 		$idField = static::getIDField();
-		$options = ['where' => $idField . '=' . $this->$idField, 'output' => SQLAdapter::ARR_FIRST];
+		$options = ['where' => $idField . '=' . $this->$idField, 'output' => SqlAdapter::ARR_FIRST];
 		if( $fieldName ) {
 			if( !in_array($fieldName, static::$fields) ) {
 				throw new FieldNotFoundException($fieldName, static::getClass());
@@ -573,7 +573,7 @@ abstract class PermanentObject {
 		}
 		try {
 			$data = static::get($options);
-		} catch( SQLException $e ) {
+		} catch( SqlException $e ) {
 			$data = null;
 		}
 		if( !$data ) {
@@ -603,11 +603,11 @@ abstract class PermanentObject {
 	 * Get some permanent objects
 	 *
 	 * @param array $options The options used to get the permanents object
-	 * @return SQLSelectRequest|static|static[]|array An array of array containing object's data
-	 * @see SQLAdapter
+	 * @return SqlSelectRequest|static|static[]|array An array of array containing object's data
+	 * @see SqlAdapter
 	 *
 	 * Get an objects' list using this class' table.
-	 * Take care that output=SQLAdapter::ARR_OBJECTS and number=1 is different from output=SQLAdapter::OBJECT
+	 * Take care that output=SqlAdapter::ARR_OBJECTS and number=1 is different from output=SqlAdapter::OBJECT
 	 *
 	 */
 	public static function get($options = null) {
@@ -615,8 +615,8 @@ abstract class PermanentObject {
 			/** @noinspection PhpIncompatibleReturnTypeInspection */
 			return static::select();
 		}
-		if( $options instanceof SQLSelectRequest ) {
-			$options->setSQLAdapter(static::getSqlAdapter());
+		if( $options instanceof SqlSelectRequest ) {
+			$options->setSqlAdapter(static::getSqlAdapter());
 			$options->setIDField(static::$ID_FIELD);
 			$options->from(static::$table);
 			
@@ -635,21 +635,21 @@ abstract class PermanentObject {
 		$options['table'] = static::$table;
 		// May be incompatible with old revisions (< R398)
 		if( !isset($options['output']) ) {
-			$options['output'] = SQLAdapter::ARR_OBJECTS;
+			$options['output'] = SqlAdapter::ARR_OBJECTS;
 		}
 		//This method intercepts outputs of array of objects.
 		$onlyOne = $objects = 0;
-		if( in_array($options['output'], [SQLAdapter::ARR_OBJECTS, SQLAdapter::OBJECT]) ) {
-			if( $options['output'] == SQLAdapter::OBJECT ) {
+		if( in_array($options['output'], [SqlAdapter::ARR_OBJECTS, SqlAdapter::OBJECT]) ) {
+			if( $options['output'] == SqlAdapter::OBJECT ) {
 				$options['number'] = 1;
 				$onlyOne = 1;
 			}
-			$options['output'] = SQLAdapter::ARR_ASSOC;
+			$options['output'] = SqlAdapter::ARR_ASSOC;
 			$objects = 1;
 		}
 		$sqlAdapter = static::getSqlAdapter();
 		$r = $sqlAdapter->select($options);
-		if( empty($r) && in_array($options['output'], [SQLAdapter::ARR_ASSOC, SQLAdapter::ARR_OBJECTS, SQLAdapter::ARR_FIRST]) ) {
+		if( empty($r) && in_array($options['output'], [SqlAdapter::ARR_ASSOC, SqlAdapter::ARR_OBJECTS, SqlAdapter::ARR_FIRST]) ) {
 			return $onlyOne && $objects ? null : [];
 		}
 		if( !empty($r) && $objects ) {
@@ -667,11 +667,11 @@ abstract class PermanentObject {
 	/**
 	 * Get select query
 	 *
-	 * @return SQLSelectRequest The query
-	 * @see SQLAdapter
+	 * @return SqlSelectRequest The query
+	 * @see SqlAdapter
 	 */
 	public static function select() {
-		return SQLRequest::select(static::getSqlAdapter(), static::$ID_FIELD, static::getClass())->from(static::$table)->asObjectList();
+		return SqlRequest::select(static::getSqlAdapter(), static::$ID_FIELD, static::getClass())->from(static::$table)->asObjectList();
 	}
 	
 	/**
@@ -1149,7 +1149,7 @@ abstract class PermanentObject {
 	 *
 	 * @param string $identifier The identifier to escape. Default is table name.
 	 * @return string The escaped identifier
-	 * @see SQLAdapter::escapeIdentifier()
+	 * @see SqlAdapter::escapeIdentifier()
 	 * @see static::ei()
 	 */
 	public static function escapeIdentifier($identifier = null) {
@@ -1173,7 +1173,7 @@ abstract class PermanentObject {
 	 *
 	 * @param mixed $value The value to format
 	 * @return string The formatted $Value
-	 * @see SQLAdapter::formatValue()
+	 * @see SqlAdapter::formatValue()
 	 */
 	public static function formatValue($value) {
 		$sqlAdapter = static::getSqlAdapter();
@@ -1280,7 +1280,7 @@ abstract class PermanentObject {
 	 */
 	public static function getCreateOperation($input, $fields): CreateTransactionOperation {
 		$operation = new CreateTransactionOperation(static::getClass(), $input, $fields);
-		$operation->setSQLAdapter(static::getSqlAdapter());
+		$operation->setSqlAdapter(static::getSqlAdapter());
 		
 		return $operation;
 	}

@@ -5,7 +5,7 @@
 
 namespace Orpheus\Publisher\Transaction;
 
-use Orpheus\SQLAdapter\SQLAdapter;
+use Orpheus\SqlAdapter\SqlAdapter;
 
 /**
  * The TransactionOperation class
@@ -32,7 +32,7 @@ abstract class TransactionOperation {
 	/**
 	 * The SQL Adapter
 	 *
-	 * @var SQLAdapter $sqlAdapter
+	 * @var SqlAdapter $sqlAdapter
 	 */
 	protected $sqlAdapter;
 	
@@ -96,21 +96,22 @@ abstract class TransactionOperation {
 	/**
 	 * Get the SQL Adapter
 	 *
-	 * @return \Orpheus\SQLAdapter\SQLAdapter|NULL
+	 * @return \Orpheus\SqlAdapter\SqlAdapter|NULL
 	 */
-	public function getSQLAdapter() {
+	public function getSqlAdapter() {
 		return $this->sqlAdapter ? $this->sqlAdapter :
-			($this->transactionOperationSet ? $this->transactionOperationSet->getSQLAdapter() : null);
+			($this->transactionOperationSet ? $this->transactionOperationSet->getSqlAdapter() : null);
 	}
 	
 	/**
 	 * Set the SQL Adapter
 	 *
-	 * @param SQLAdapter $sqlAdapter
+	 * @param SqlAdapter $sqlAdapter
 	 * @return \Orpheus\Publisher\Transaction\TransactionOperation
 	 */
-	public function setSQLAdapter(SQLAdapter $sqlAdapter) {
+	public function setSqlAdapter(SqlAdapter $sqlAdapter) {
 		$this->sqlAdapter = $sqlAdapter;
+		
 		return $this;
 	}
 	
