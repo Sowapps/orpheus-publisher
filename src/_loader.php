@@ -15,6 +15,7 @@ if( !defined('ORPHEUSPATH') ) {
 }
 
 defifn('CHECK_MODULE_ACCESS', true);
+/** @const bool ENTITY_CLASS_CHECK */
 defifn('ENTITY_CLASS_CHECK', true);
 
 // Hooks

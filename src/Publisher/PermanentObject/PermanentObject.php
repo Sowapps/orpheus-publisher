@@ -103,14 +103,14 @@ abstract class PermanentObject {
 	 *
 	 * @var bool
 	 */
-	protected static bool $checkFieldIntegrity = ENTITY_CLASS_CHECK;
+	protected static bool $checkFieldIntegrity = !!ENTITY_CLASS_CHECK;
 	
 	/**
 	 * Currently modified fields
 	 *
 	 * @var array
 	 */
-	protected $modFields = [];
+	protected array $modFields = [];
 	/**
 	 * The object's data
 	 *
