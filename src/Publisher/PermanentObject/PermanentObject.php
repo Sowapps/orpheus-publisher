@@ -22,7 +22,6 @@ use Orpheus\Publisher\Transaction\DeleteTransactionOperation;
 use Orpheus\Publisher\Transaction\UpdateTransactionOperation;
 use Orpheus\SqlAdapter\Exception\SqlException;
 use Orpheus\SqlAdapter\SqlAdapter;
-use Orpheus\SqlRequest\SqlRequest;
 use Orpheus\SqlRequest\SqlSelectRequest;
 use RuntimeException;
 
@@ -86,8 +85,6 @@ abstract class PermanentObject {
 	
 	/**
 	 * Editable fields
-	 *
-	 * @var array
 	 */
 	protected static ?array $editableFields = null;
 	
@@ -96,7 +93,7 @@ abstract class PermanentObject {
 	 *
 	 * @var array
 	 */
-	protected static $knownClassData = [];
+	protected static array $knownClassData = [];
 	
 	/**
 	 * Should check fields integrity when load one element ?
@@ -106,30 +103,34 @@ abstract class PermanentObject {
 	protected static bool $checkFieldIntegrity = !!ENTITY_CLASS_CHECK;
 	
 	/**
-	 * Currently modified fields
-	 *
-	 * @var array
-	 */
-	protected array $modFields = [];
-	/**
 	 * The object's data
 	 *
 	 * @var array
 	 */
-	protected $data = [];
+	protected array $data = [];
+	
+	/**
+	 * The original data of object
+	 * Only filled when edited to store previous data (first loaded, got from db)
+	 *
+	 * @var array
+	 */
+	protected array $originalData = [];
+	
 	/**
 	 * Is this object deleted ?
 	 *
 	 * @var boolean
 	 */
-	protected $isDeleted = false;
+	protected bool $isDeleted = false;
+	
 	/**
 	 * Is this object called onSaved ?
 	 * It prevents recursive calls
 	 *
 	 * @var boolean
 	 */
-	protected $onSavedInProgress = false;
+	protected bool $onSavedInProgress = false;
 	
 	/**
 	 * PermanentObject constructor
@@ -142,8 +143,10 @@ abstract class PermanentObject {
 	}
 	
 	/**
+	 * Set all data of object (internal use only)
+	 *
 	 * @param array $data
-	 * @internal Only for load & reload methods
+	 * @warning Internal use only, to load & reload
 	 */
 	protected function setData(array $data) {
 		foreach( static::$fields as $fieldName ) {
@@ -161,19 +164,10 @@ abstract class PermanentObject {
 			}
 			$this->data[$fieldName] = $this->parseFieldSqlValue($fieldName, $fieldValue);
 		}
-		$this->clearModifiedFields();
+		$this->originalData = [];
 		if( defined('DEV_VERSION') && DEV_VERSION ) {
 			$this->checkIntegrity();
 		}
-	}
-	
-	/**
-	 * Get the name of this class
-	 *
-	 * @return string The name of this class.
-	 */
-	public static function getClass() {
-		return get_called_class();
 	}
 	
 	/**
@@ -186,13 +180,6 @@ abstract class PermanentObject {
 	 */
 	protected static function parseFieldSqlValue(string $name, $value) {
 		return $value;
-	}
-	
-	/**
-	 * Clear modified fields
-	 */
-	protected function clearModifiedFields() {
-		$this->modFields = [];
 	}
 	
 	/**
@@ -237,7 +224,45 @@ abstract class PermanentObject {
 		if( !array_key_exists($key, $this->data) ) {
 			throw new FieldNotFoundException($key, static::getClass());
 		}
+		
 		return $this->data[$key];
+	}
+	
+	/**
+	 * Set the value of a field
+	 *
+	 * @param string $key Name of the field to set
+	 * @param mixed $value New value of the field
+	 * @return $this
+	 * @throws Exception
+	 * @throws FieldNotFoundException
+	 *
+	 * Set the field $key with the new $value.
+	 */
+	public function setValue(string $key, $value): PermanentObject {
+		if( !in_array($key, static::$fields) ) {
+			// Unknown key
+			throw new FieldNotFoundException($key, static::getClass());
+			
+		} elseif( $key === static::$ID_FIELD ) {
+			// ID is not editable
+			throw new Exception("idNotEditable");
+			
+		} elseif( $value !== $this->data[$key] ) {
+			// The value is different
+			if( !isset($this->originalData[$key]) ) {
+				// Keep first one only, once updated, we should remove it
+				$this->originalData[$key] = $this->data[$key];
+			} else {
+				if( $this->originalData[$key] === $value ) {
+					// The first value is the same as the new one, revert changes
+					unset($this->originalData[$key]);
+				}
+			}
+			$this->data[$key] = $value;
+		}
+		
+		return $this;
 	}
 	
 	/**
@@ -246,14 +271,28 @@ abstract class PermanentObject {
 	 * If something was modified, it saves the new data.
 	 */
 	public function __destruct() {
-		if( !empty($this->modFields) ) {
+		if( $this->hasChanges() ) {
 			try {
 				$this->save();
 			} catch( Exception $e ) {
-				// Can be destructed outside of the matrix
+				// Can be destructed outside the matrix
 				log_error($e, 'PermanentObject::__destruct(): Saving');
 			}
 		}
+	}
+	
+	public function revert(): PermanentObject {
+		// Apply back the previous values
+		foreach( $this->originalData as $key => $value ) {
+			$this->data[$key] = $value;
+			unset($this->originalData[$key]);
+		}
+		
+		return $this;
+	}
+	
+	public function hasChanges(): bool {
+		return !!$this->originalData;
 	}
 	
 	/**
@@ -265,24 +304,27 @@ abstract class PermanentObject {
 	 * If some fields was modified, it saves these fields using the SQL Adapter.
 	 */
 	public function save() {
-		if( empty($this->modFields) || $this->isDeleted() ) {
+		if( !$this->hasChanges() || $this->isDeleted() ) {
 			return false;
 		}
 		
-		$data = array_filterbykeys($this->data, $this->modFields);
+		$fields = array_keys($this->originalData);
+		$data = array_filterbykeys($this->data, $fields);
 		if( !$data ) {
 			throw new Exception('No updated data found but there is modified fields, unable to update');
 		}
-		$operation = $this->getUpdateOperation($data, $this->modFields);
+		$operation = $this->getUpdateOperation($data, $fields);
 		// Do not validate, new data are invalid due to the fact the new data are already in object
 		$r = $operation->run();
-		$this->modFields = [];
+		// Object takes new values as acquired
+		$this->originalData = [];
 		if( !$this->onSavedInProgress ) {
 			// Protect script against saving loops
 			$this->onSavedInProgress = true;
 			static::onSaved($data, $this);
 			$this->onSavedInProgress = false;
 		}
+		
 		return $r;
 	}
 	
@@ -293,7 +335,7 @@ abstract class PermanentObject {
 	 *
 	 * Checks if this object is known as deleted.
 	 */
-	public function isDeleted() {
+	public function isDeleted(): bool {
 		return $this->isDeleted;
 	}
 	
@@ -304,7 +346,7 @@ abstract class PermanentObject {
 	 * @param string[] $fields The array of fields to check
 	 * @return UpdateTransactionOperation
 	 */
-	public function getUpdateOperation($input, $fields) {
+	public function getUpdateOperation($input, $fields): UpdateTransactionOperation {
 		$operation = new UpdateTransactionOperation(static::getClass(), $input, $fields, $this);
 		$operation->setSqlAdapter(static::getSqlAdapter());
 		
@@ -375,51 +417,6 @@ abstract class PermanentObject {
 	}
 	
 	/**
-	 * Set the value of a field
-	 *
-	 * @param string $key Name of the field to set
-	 * @param mixed $value New value of the field
-	 * @return $this
-	 * @throws Exception
-	 * @throws FieldNotFoundException
-	 *
-	 * Set the field $key with the new $value.
-	 */
-	public function setValue($key, $value) {
-		if( $key === null ) {
-			// Invalid key
-			throw new Exception("nullKey");
-			
-		} elseif( !in_array($key, static::$fields) ) {
-			// Unknown key
-			throw new FieldNotFoundException($key, static::getClass());
-			
-		} elseif( $key === static::$ID_FIELD ) {
-			// ID is not editable
-			throw new Exception("idNotEditable");
-			
-		} elseif( $value !== $this->data[$key] ) {
-			// The value is different
-			$this->addModFields($key);
-			$this->data[$key] = $value;
-		}
-		return $this;
-	}
-	
-	/**
-	 * Mark the field as modified
-	 *
-	 * @param string $field The field to mark as modified.
-	 *
-	 * Adds the $field to the modified fields array.
-	 */
-	protected function addModFields($field) {
-		if( !in_array($field, $this->modFields) ) {
-			$this->modFields[] = $field;
-		}
-	}
-	
-	/**
 	 * Magic isset
 	 *
 	 * @param string $name Name of the property to check is set
@@ -454,17 +451,8 @@ abstract class PermanentObject {
 	 *
 	 * Get this object ID according to the table and id.
 	 */
-	public function uid() {
+	public function uid(): string {
 		return $this->getTable() . '#' . $this->id();
-	}
-	
-	/**
-	 * Get the table of this class
-	 *
-	 * @return string The table of this class.
-	 */
-	public static function getTable() {
-		return static::$table;
 	}
 	
 	/**
@@ -512,8 +500,9 @@ abstract class PermanentObject {
 	 */
 	public function free() {
 		if( $this->remove() ) {
-			$this->data = null;
-			$this->modFields = null;
+			$this->data = [];
+			$this->originalData = [];
+			
 			return true;
 		}
 		return false;
@@ -547,30 +536,11 @@ abstract class PermanentObject {
 	
 	/**
 	 * Reload fields from database
-	 *
-	 * @param string $fieldName The field to reload, default is null (all fields).
-	 * @return boolean True if done
-	 * @throws FieldNotFoundException
-	 *
-	 * Update the current object's fields from database.
-	 * If $field is not set, it reloads only one field else all fields.
 	 * Also it removes the reloaded fields from the modified ones list.
 	 */
-	public function reload($fieldName = null) {
+	public function reload(): bool {
 		$idField = static::getIDField();
 		$options = ['where' => $idField . '=' . $this->$idField, 'output' => SqlAdapter::ARR_FIRST];
-		if( $fieldName ) {
-			if( !in_array($fieldName, static::$fields) ) {
-				throw new FieldNotFoundException($fieldName, static::getClass());
-			}
-			$i = array_search($fieldName, $this->modFields);
-			if( $i !== false ) {
-				unset($this->modFields[$i]);
-			}
-			$options['what'] = $fieldName;
-		} else {
-			$this->modFields = [];
-		}
 		try {
 			$data = static::get($options);
 		} catch( SqlException $e ) {
@@ -581,21 +551,15 @@ abstract class PermanentObject {
 			
 			return false;
 		}
-		if( $fieldName ) {
-			$this->data[$fieldName] = $this->parseFieldSqlValue($fieldName, $data[$fieldName]);
-		} else {
-			$this->setData($data);
-		}
+		$this->setData($data);
 		
 		return true;
 	}
 	
 	/**
 	 * Get the ID field name of this class
-	 *
-	 * @return string The ID field of this class.
 	 */
-	public static function getIDField() {
+	public static function getIDField(): string {
 		return static::$ID_FIELD;
 	}
 	
@@ -661,6 +625,7 @@ abstract class PermanentObject {
 				}
 			}
 		}
+		
 		return $r;
 	}
 	
@@ -670,8 +635,9 @@ abstract class PermanentObject {
 	 * @return SqlSelectRequest The query
 	 * @see SqlAdapter
 	 */
-	public static function select() {
-		return SqlRequest::select(static::getSqlAdapter(), static::$ID_FIELD, static::getClass())->from(static::$table)->asObjectList();
+	public static function select(): SqlSelectRequest {
+		return (new SqlSelectRequest(static::getSqlAdapter(), static::$ID_FIELD, static::getClass()))
+			->from(static::$table)->asObjectList();
 	}
 	
 	/**
@@ -756,7 +722,7 @@ abstract class PermanentObject {
 	 *
 	 * Get the domain of this class, can be guessed from $table or specified in $domain.
 	 */
-	public static function getDomain() {
+	public static function getDomain(): string {
 		return static::$domain;
 	}
 	
@@ -834,7 +800,7 @@ abstract class PermanentObject {
 	 * Check if this object is not deleted.
 	 * May be used for others cases.
 	 */
-	public function isValid() {
+	public function isValid(): bool {
 		return !$this->isDeleted();
 	}
 	
@@ -846,7 +812,7 @@ abstract class PermanentObject {
 	 *
 	 * Compare the class and the ID field value of the 2 objects.
 	 */
-	public function equals($o) {
+	public function equals($o): bool {
 		return is_object($o) && get_class($this) == get_class($o) && $this->id() == $o->id();
 	}
 	
@@ -894,7 +860,7 @@ abstract class PermanentObject {
 	 *
 	 * Build a new log event for $event for this time and the user IP address.
 	 */
-	public static function getLogEvent($event, $time = null, $ipAdd = null) {
+	public static function getLogEvent($event, $time = null, $ipAdd = null): array {
 		return [
 			$event . '_time' => isset($time) ? $time : time(),
 			$event . '_date' => isset($time) ? static::now($time) : static::now(),
@@ -914,15 +880,6 @@ abstract class PermanentObject {
 			return ['id' => $this->id(), 'label' => $this->getLabel()];
 		}
 		return null;
-	}
-	
-	/**
-	 * List all modified fields
-	 *
-	 * @return string[]
-	 */
-	protected function listModifiedFields() {
-		return $this->modFields;
 	}
 	
 	/**
@@ -952,7 +909,7 @@ abstract class PermanentObject {
 	 * @param int $newErrors
 	 * @return boolean
 	 */
-	public static function onValidUpdate(&$input, $newErrors) {
+	public static function onValidUpdate(&$input, $newErrors): bool {
 		// Don't care about some errors, other fields should be updated.
 		$found = 0;
 		foreach( $input as $fieldname => $fieldvalue ) {
@@ -1004,7 +961,7 @@ abstract class PermanentObject {
 	 * @return array
 	 * @uses UpdateTransactionOperation
 	 */
-	public static function extractUpdateQuery(&$input, PermanentObject $object) {
+	public static function extractUpdateQuery(&$input, PermanentObject $object): array {
 		static::onEdit($input, $object);
 		
 		foreach( $input as $fieldName => $fieldValue ) {
@@ -1014,6 +971,7 @@ abstract class PermanentObject {
 			}
 		}
 		$idField = static::getIDField();
+		
 		return [
 			'table'  => static::$table,
 			'what'   => $input,
@@ -1026,7 +984,7 @@ abstract class PermanentObject {
 	 * Run for Object edit
 	 *
 	 * @param array $data the new data
-	 * @param PermanentObject $object the old data
+	 * @param ?PermanentObject $object the old data
 	 * @see update()
 	 * @see create()
 	 *
@@ -1065,7 +1023,7 @@ abstract class PermanentObject {
 	 * @param string $fieldName
 	 * @return boolean
 	 */
-	public static function isFieldEditable($fieldName) {
+	public static function isFieldEditable($fieldName): bool {
 		if( $fieldName == static::$ID_FIELD ) {
 			return false;
 		}
@@ -1075,6 +1033,7 @@ abstract class PermanentObject {
 		if( method_exists(static::$validator, 'isFieldEditable') ) {
 			return in_array($fieldName, static::$editableFields);
 		}
+		
 		return in_array($fieldName, static::$fields);
 	}
 	
@@ -1084,18 +1043,14 @@ abstract class PermanentObject {
 	 * @param array $objects
 	 * @return array
 	 */
-	public static function cacheObjects(array &$objects) {
+	public static function cacheObjects(array &$objects): array {
 		foreach( $objects as &$obj ) {
 			$obj = $obj->checkCache();
 		}
+		
 		return $objects;
 	}
 	
-	/**
-	 * Get cache stats
-	 *
-	 * @return \Orpheus\Publisher\PermanentObject\PermanentObject
-	 */
 	public static function getCacheStats() {
 		return array_sum(array_map('count', static::$instances));
 	}
@@ -1140,7 +1095,7 @@ abstract class PermanentObject {
 	 * @return string The escaped identifier
 	 * @see static::escapeIdentifier()
 	 */
-	public static function ei($identifier = null) {
+	public static function ei($identifier = null): string {
 		return static::escapeIdentifier($identifier);
 	}
 	
@@ -1152,8 +1107,9 @@ abstract class PermanentObject {
 	 * @see SqlAdapter::escapeIdentifier()
 	 * @see static::ei()
 	 */
-	public static function escapeIdentifier($identifier = null) {
+	public static function escapeIdentifier($identifier = null): string {
 		$sqlAdapter = static::getSqlAdapter();
+		
 		return $sqlAdapter->escapeIdentifier($identifier ? $identifier : static::$table);
 	}
 	
@@ -1164,7 +1120,7 @@ abstract class PermanentObject {
 	 * @return string The formatted $Value
 	 * @see PermanentObject::formatValue()
 	 */
-	public static function fv($value) {
+	public static function fv($value): string {
 		return static::formatValue($value);
 	}
 	
@@ -1527,6 +1483,24 @@ abstract class PermanentObject {
 	 */
 	public static function setCheckFieldIntegrity(bool $checkFieldIntegrity): void {
 		self::$checkFieldIntegrity = $checkFieldIntegrity;
+	}
+	
+	/**
+	 * Get the table of this class
+	 *
+	 * @return string The table of this class.
+	 */
+	public static function getTable(): string {
+		return static::$table;
+	}
+	
+	/**
+	 * Get the name of this class
+	 *
+	 * @return string The name of this class.
+	 */
+	public static function getClass(): string {
+		return get_called_class();
 	}
 	
 }
