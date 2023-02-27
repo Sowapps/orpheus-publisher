@@ -52,9 +52,9 @@ class TransactionOperationSet implements \IteratorAggregate {
 	/**
 	 * Get the SQL Adapter
 	 *
-	 * @return \Orpheus\SqlAdapter\SqlAdapter
+	 * @return SqlAdapter
 	 */
-	public function getSqlAdapter() {
+	public function getSqlAdapter(): SqlAdapter {
 		return $this->sqlAdapter;
 	}
 	
@@ -67,7 +67,7 @@ class TransactionOperationSet implements \IteratorAggregate {
 		}
 		// Validate all operations before saving it
 		$this->validateOperations();
-		// Then operations are valids, so we save it
+		// Then operations are valid, so we save it
 		$this->runOperations();
 	}
 	
