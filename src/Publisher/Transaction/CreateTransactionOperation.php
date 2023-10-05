@@ -1,11 +1,12 @@
 <?php
 /**
- * CreateTransactionOperation
+ * @author Florent HAZARD <f.hazard@sowapps.com>
  */
 
 namespace Orpheus\Publisher\Transaction;
 
-use Orpheus\Publisher\PermanentObject\PermanentObject;
+use Orpheus\EntityDescriptor\Entity\PermanentEntity;
+use Orpheus\Exception\UserException;
 
 /**
  * The CreateTransactionOperation class
@@ -21,30 +22,23 @@ class CreateTransactionOperation extends TransactionOperation {
 	 *
 	 * @var array
 	 */
-	protected $data;
+	protected array $data;
 	
 	/**
 	 * Fields to restrict creation
 	 *
 	 * @var string[]
 	 */
-	protected $fields;
+	protected ?array $fields;
 	
 	/**
 	 * The resulting ID after inserted data
 	 *
-	 * @var string
+	 * @var string|null
 	 */
-	protected $insertID;
+	protected ?string $insertId = null;
 	
-	/**
-	 * Constructor
-	 *
-	 * @param string $class
-	 * @param array $data
-	 * @param string[] $fields
-	 */
-	public function __construct($class, array $data, $fields) {
+	public function __construct(string $class, array $data, ?array $fields) {
 		parent::__construct($class);
 		$this->data = $data;
 		$this->fields = $fields;
@@ -53,54 +47,51 @@ class CreateTransactionOperation extends TransactionOperation {
 	/**
 	 *
 	 * {@inheritDoc}
-	 * @param array $errors
 	 * @see TransactionOperation::validate()
 	 */
-	public function validate(&$errors = 0) {
-		/** @var PermanentObject $class */
+	public function validate(int &$errors = 0): void {
+		/** @var class-string<PermanentEntity> $class */
 		$class = $this->class;
 		
 		$newErrors = 0;
-		$this->data = $class::checkUserInput($this->data, $this->fields, null, $newErrors);
 		
-		$class::onValidCreate($this->data, $newErrors);
+		try {
+			$this->data = $class::checkUserInput($this->data, $this->fields, null, $newErrors);
+			$class::onValidEdit($this->data, null, $newErrors);
+			$class::onValidCreate($this->data, $newErrors);
+		} catch( UserException $exception ) {
+			reportError($exception);
+			$newErrors++;
+		}
 		
+		$this->setIsValid(!$newErrors);
 		$errors += $newErrors;
-		
-		$this->setValid();
 	}
 	
-	/**
-	 *
-	 * {@inheritDoc}
-	 * @see TransactionOperation::run()
-	 */
-	public function run() {
-		// TODO : Use a SqlCreateRequest class
-		/** @var PermanentObject $class */
+	public function run(): string|false {
+		/** @var class-string<PermanentEntity> $class */
 		$class = $this->class;
-		$queryOptions = $class::extractCreateQuery($this->data);
+		$input = $this->data;
+		$class::onEdit($input, null);
+		$query = $class::requestInsert()->fields($input);
+		$result = $query->run();
 		
-		$sqlAdapter = $this->getSqlAdapter();
-		
-		$r = $sqlAdapter->insert($queryOptions);
-		
-		if( $r ) {
-			$this->insertID = $sqlAdapter->lastID($queryOptions['table']);
+		if( $result ) {
+			// Success
+			$this->insertId = $query->getLastId();
+			$class::onSaved($this->data, $this->insertId);
 			
-			$class::onSaved($this->data, $this->insertID);
-			
-			return $this->insertID;
+			return $this->insertId;
 		}
-		return 0;
+		
+		return false;
 	}
 	
 	/**
 	 * Get the last inserted data's id
-	 *
-	 * @return string
 	 */
-	public function getInsertID() {
-		return $this->insertID;
+	public function getInsertId(): ?string {
+		return $this->insertId;
 	}
+	
 }

@@ -1,6 +1,6 @@
 <?php
 /**
- * FixtureRepository
+ * @author Florent HAZARD <f.hazard@sowapps.com>
  */
 
 namespace Orpheus\Publisher\Fixture;
@@ -17,14 +17,12 @@ class FixtureRepository {
 	 * 
 	 * @var array
 	 */
-	protected static $fixtures	= array();
+	protected static array $fixtures = [];
 	
 	/**
 	 * Register $class having some fixtures to load
-	 * 
-	 * @param string $class
 	 */
-	public static function register($class) {
+	public static function register(string $class): void {
 		if( array_key_exists($class, static::$fixtures) ) {
 			return;
 		}
@@ -36,16 +34,17 @@ class FixtureRepository {
 	 * 
 	 * @return string[]
 	 */
-	public static function listAll() {
-		$r = array();
+	public static function listAll(): array {
+		$repositories = array();
 		foreach( static::$fixtures as $class => &$state ) {
 			if( $state == null ) {
-				$state	= class_exists($class, true) && is_subclass_of($class, 'Orpheus\Publisher\Fixture\FixtureInterface');
+				$state = class_exists($class) && is_subclass_of($class, 'Orpheus\Publisher\Fixture\FixtureInterface');
 			}
-			if( $state == true ) {
-				$r[] = $class;
+			if( $state ) {
+				$repositories[] = $class;
 			}
 		}
-		return $r;
+		return $repositories;
 	}
+	
 }

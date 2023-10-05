@@ -19,25 +19,25 @@ class FieldNotFoundException extends RuntimeException {
 	 *
 	 * @var string
 	 */
-	protected $fieldname;
+	protected string $fieldName;
 	
 	/**
 	 * The source of the exception
 	 *
-	 * @var string
+	 * @var string|null
 	 */
-	protected $source;
+	protected ?string $source;
 	
 	/**
 	 * Constructor
 	 *
-	 * @param string $fieldname The name of the missing field.
-	 * @param string $source The source of the exception, optional. Default value is null.
+	 * @param string $fieldName The name of the missing field.
+	 * @param string|null $source The source of the exception, optional. Default value is null.
 	 */
-	public function __construct($fieldname, $source=null) {
-		parent::__construct('fieldNotFound['.(isset($source) ? $source.'-' : '').$fieldname.']', 1001);
-		$this->fieldname	= (string) $fieldname;
-		$this->source		= (string) $source;
+	public function __construct(string $fieldName, ?string $source = null) {
+		parent::__construct('fieldNotFound[' . (isset($source) ? $source . '-' : '') . $fieldName . ']', 1001);
+		$this->fieldName = $fieldName;
+		$this->source = $source;
 	}
 	
 	/**
@@ -45,16 +45,16 @@ class FieldNotFoundException extends RuntimeException {
 	 *
 	 * @return string The field name.
 	 */
-	public function getFieldName() {
-		return $this->fieldname;
+	public function getFieldName(): string {
+		return $this->fieldName;
 	}
 	
 	/**
 	 * Get the source
 	 *
-	 * @return string The source of the exception.
+	 * @return string|null The source of the exception.
 	 */
-	public function getSource() {
+	public function getSource(): ?string {
 		return $this->source;
 	}
 }

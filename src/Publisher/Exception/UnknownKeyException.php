@@ -5,19 +5,21 @@
 
 namespace Orpheus\Publisher\Exception;
 
+use Exception;
+
 /**
  * The unknown key exception class
  * 
  * This exception is thrown when a required key is not found
 */
-class UnknownKeyException extends \Exception {
+class UnknownKeyException extends Exception {
 	
 	/**
 	 * The key of success
 	 * 
 	 * @var string
 	 */
-	protected $key;
+	protected string $key;
 	
 	/**
 	 * Constructor
@@ -25,9 +27,9 @@ class UnknownKeyException extends \Exception {
 	 * @param string $message The message.
 	 * @param string $key The unknown key.
 	 */
-	public function __construct($message, $key) {
+	public function __construct(string $message, string $key) {
 		parent::__construct($message, 1002);
-		$this->key = (string) $key;
+		$this->key = $key;
 	}
 	
 	/**
@@ -35,7 +37,7 @@ class UnknownKeyException extends \Exception {
 	 * 
 	 * @return string The key.
 	 */
-	public function getKey() {
+	public function getKey(): string {
 		return $this->key;
 	}
 }

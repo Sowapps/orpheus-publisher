@@ -1,37 +1,37 @@
 {
-	"name" : "orpheus/orpheus-publisher",
-	"description" : "Orpheus Publisher",
-	"keywords" : [
+	"name": "orpheus/orpheus-publisher",
+	"description": "Orpheus Publisher",
+	"type": "orpheus-library",
+	"license": "MIT",
+	"keywords": [
 		"orpheus",
 		"publisher",
 		"database",
 		"persistent",
 		"object"
 	],
-	"autoload" : {
-		"psr-4" : {
-			"Orpheus\\" : "src"
+	"autoload": {
+		"psr-4": {
+			"Orpheus\\": "src/"
 		},
-		"files" : [
+		"files": [
 			"src/_loader.php"
 		]
 	},
-	"require" : {
-	  "orpheus/orpheus-core": "1.*",
-	  "orpheus/orpheus-hook": "1.*",
-	  "orpheus/orpheus-cache": "1.*",
-	  "orpheus/orpheus-sqladapter": "1.*",
-	  "orpheus/orpheus-yaml": "1.*",
-	  "orpheus/orpheus-rendering": "1.*",
-	  "orpheus/orpheus-inputcontroller": "1.*"
+	"require": {
+		"orpheus/orpheus-core": "^4.0.0",
+		"orpheus/orpheus-sqladapter": "^4.0.0"
 	},
-	"type" : "library",
-	"license" : "MIT",
-	"authors" : [{
-			"name" : "Florent HAZARD",
-			"email" : "contact@sowapps.com",
-			"homepage" : "http://sowapps.com",
-			"role" : "Developer"
+	"extra": {
+		"orpheus-library": {
+			"class": "Orpheus\\Publisher\\OrpheusPublisherLibrary"
+		}
+	},
+	"authors": [{
+			"name": "Florent HAZARD",
+			"email": "contact@sowapps.com",
+			"homepage": "https://sowapps.com",
+			"role": "Developer"
 		}
 	]
 }

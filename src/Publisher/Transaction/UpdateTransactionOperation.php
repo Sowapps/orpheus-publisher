@@ -5,7 +5,8 @@
 
 namespace Orpheus\Publisher\Transaction;
 
-use Orpheus\Publisher\PermanentObject\PermanentObject;
+use Orpheus\EntityDescriptor\Entity\PermanentEntity;
+use Orpheus\Exception\UserException;
 
 /**
  * The UpdateTransactionOperation class
@@ -21,74 +22,78 @@ class UpdateTransactionOperation extends TransactionOperation {
 	 *
 	 * @var array
 	 */
-	protected $data;
+	protected array $data;
 	
 	/**
 	 * Fields to restrict creation
 	 *
 	 * @var string[]
 	 */
-	protected $fields;
+	protected array $fields;
 	
 	/**
 	 * The object of this operation
 	 *
-	 * @var PermanentObject
+	 * @var PermanentEntity
 	 */
-	protected $object;
+	protected PermanentEntity $entity;
 	
 	/**
 	 * Constructor
 	 *
-	 * @param string $class
-	 * @param array $data
 	 * @param string[] $fields
-	 * @param PermanentObject $object
 	 */
-	public function __construct($class, array $data, $fields, PermanentObject $object) {
+	public function __construct(string $class, array $data, array $fields, PermanentEntity $entity) {
 		parent::__construct($class);
 		$this->data = $data;
 		$this->fields = $fields;
-		$this->object = $object;
+		$this->entity = $entity;
 	}
 	
 	/**
 	 *
 	 * {@inheritDoc}
-	 * @param array $errors
-	 * @see \Orpheus\Publisher\Transaction\TransactionOperation::validate()
+	 * @see TransactionOperation::validate()
 	 */
-	public function validate(&$errors = 0) {
+	public function validate(int &$errors = 0): void {
+		/** @var class-string<PermanentEntity> $class */
 		$class = $this->class;
 		$newErrors = 0;
 		
-		$this->data = $class::checkUserInput($this->data, $this->fields, $this->object, $newErrors);
+		try {
+			$this->data = $class::checkUserInput($this->data, $this->fields, $this->entity, $newErrors);
+			// Moved to checkUserInput
+//			if( !$this->data ) {
+//				// No data to update, we can not process update
+//				$class::throwException('update.noChange');
+//			}
+			$class::onValidEdit($this->data, $this->entity, $newErrors);
+			$class::onValidUpdate($this->data, $newErrors);
+		} catch( UserException $exception ) {
+			reportError($exception);
+			$newErrors++;
+		}
 		
-		$this->setIsValid($class::onValidUpdate($this->data, $newErrors));
-		
+		$this->setIsValid(!$newErrors);
 		$errors += $newErrors;
 	}
 	
-	/**
-	 *
-	 * {@inheritDoc}
-	 * @see \Orpheus\Publisher\Transaction\TransactionOperation::run()
-	 */
-	public function run() {
-		// TODO : Use a SqlUpdateRequest class
+	public function run(): bool {
+		/** @var class-string<PermanentEntity> $class */
 		$class = $this->class;
-		$queryOptions = $class::extractUpdateQuery($this->data, $this->object);
-		
-		$sqlAdapter = $this->getSqlAdapter();
-		
-		$queryOptions['idField'] = $this->object::getIDField();
-		$r = $sqlAdapter->update($queryOptions);
+		$input = $this->data;
+		$class::onEdit($input, null);
+		$query = $class::requestUpdate()->fields($input);
+		$r = $query->run();
 		if( $r ) {
 			// Success
-			$this->object->reload();
-			$class::onSaved($this->data, $this->object);
-			return 1;
+			$this->entity->reload();
+			$class::onSaved($this->data, $this->entity);
+			
+			return true;
 		}
-		return 0;
+		
+		return false;
 	}
+	
 }

@@ -1,115 +1,94 @@
 <?php
 /**
- * TransactionOperation
+ * @author Florent Hazard <contact@sowapps.com>
  */
 
 namespace Orpheus\Publisher\Transaction;
 
-use Orpheus\SqlAdapter\SqlAdapter;
+use Orpheus\EntityDescriptor\Entity\PermanentEntity;
+use Orpheus\SqlAdapter\AbstractSqlAdapter;
 
-/**
- * The TransactionOperation class
- *
- * @author Florent Hazard <contact@sowapps.com>
- *
- */
 abstract class TransactionOperation {
 	
 	/**
 	 * The class of this operation
 	 *
-	 * @var string
+	 * @var class-string<PermanentEntity>
 	 */
-	protected $class;
+	protected string $class;
 	
 	/**
 	 * The transaction set
 	 *
-	 * @var TransactionOperationSet $transactionOperationSet
+	 * @var TransactionOperationSet|null $transactionOperationSet
 	 */
-	protected $transactionOperationSet;
+	protected ?TransactionOperationSet $transactionOperationSet;
 	
 	/**
 	 * The SQL Adapter
 	 *
-	 * @var SqlAdapter $sqlAdapter
+	 * @var AbstractSqlAdapter|null $sqlAdapter
 	 */
-	protected $sqlAdapter;
+	protected ?AbstractSqlAdapter $sqlAdapter = null;
 	
 	/**
 	 * If this Operation is valid
 	 *
 	 * @var boolean
 	 */
-	protected $isValid;
+	protected bool $isValid = false;
 	
 	/**
 	 * Constructor
-	 *
-	 * @param string $class
 	 */
-	public function __construct($class) {
+	public function __construct(string $class) {
 		$this->class = $class;
-	}
-	
-	/**
-	 * If this operation is valid
-	 *
-	 * @return boolean
-	 */
-	public function isValid() {
-		return $this->isValid;
-	}
-	
-	/**
-	 * Set this operation validity
-	 *
-	 * @param boolean $valid
-	 * @return \Orpheus\Publisher\Transaction\TransactionOperation
-	 */
-	protected function setIsValid($valid) {
-		$this->isValid = $valid;
-		return $this;
-	}
-	
-	/**
-	 * Validate this operation
-	 *
-	 * @param array $errors
-	 */
-	public abstract function validate(&$errors = 0);
-	
-	/**
-	 * Run this operation only if valid
-	 *
-	 * @return mixed
-	 */
-	public function runIfValid() {
-		return $this->isValid ? $this->run() : 0;
 	}
 	
 	/**
 	 * Run this operation
 	 */
-	public abstract function run();
+	public abstract function run(): mixed;
+	
+	/**
+	 * Run this operation only if valid
+	 */
+	public function runIfValid(): mixed {
+		return $this->isValid ? $this->run() : false;
+	}
+	
+	/**
+	 * If this operation is valid
+	 */
+	public function isValid(): bool {
+		return $this->isValid;
+	}
+	
+	/**
+	 * Set this operation validity
+	 */
+	protected function setIsValid(bool $valid): static {
+		$this->isValid = $valid;
+		
+		return $this;
+	}
+	
+	/**
+	 * Validate this operation
+	 */
+	public abstract function validate(int &$errors = 0);
 	
 	/**
 	 * Get the SQL Adapter
-	 *
-	 * @return \Orpheus\SqlAdapter\SqlAdapter|NULL
 	 */
-	public function getSqlAdapter() {
-		return $this->sqlAdapter ? $this->sqlAdapter :
-			($this->transactionOperationSet ? $this->transactionOperationSet->getSqlAdapter() : null);
+	public function getSqlAdapter(): ?AbstractSqlAdapter {
+		return $this->sqlAdapter ?: $this->transactionOperationSet?->getSqlAdapter();
 	}
 	
 	/**
 	 * Set the SQL Adapter
-	 *
-	 * @param SqlAdapter $sqlAdapter
-	 * @return \Orpheus\Publisher\Transaction\TransactionOperation
 	 */
-	public function setSqlAdapter(SqlAdapter $sqlAdapter) {
+	public function setSqlAdapter(AbstractSqlAdapter $sqlAdapter): static {
 		$this->sqlAdapter = $sqlAdapter;
 		
 		return $this;
@@ -117,41 +96,17 @@ abstract class TransactionOperation {
 	
 	/**
 	 * Get the TransactionOperationSet
-	 *
-	 * @return \Orpheus\Publisher\Transaction\TransactionOperationSet
 	 */
-	public function getTransactionOperationSet() {
+	public function getTransactionOperationSet(): TransactionOperationSet {
 		return $this->transactionOperationSet;
 	}
 	
 	/**
 	 * Set the TransactionOperationSet
-	 *
-	 * @param TransactionOperationSet $transactionOperationSet
-	 * @return \Orpheus\Publisher\Transaction\TransactionOperation
 	 */
-	public function setTransactionOperationSet(TransactionOperationSet $transactionOperationSet) {
+	public function setTransactionOperationSet(TransactionOperationSet $transactionOperationSet): static {
 		$this->transactionOperationSet = $transactionOperationSet;
-		return $this;
-	}
-	
-	/**
-	 * Set this operation as valid
-	 *
-	 * @return \Orpheus\Publisher\Transaction\TransactionOperation
-	 */
-	protected function setValid() {
-		$this->setIsValid(true);
-		return $this;
-	}
-	
-	/**
-	 * Set this operation as invalid
-	 *
-	 * @return \Orpheus\Publisher\Transaction\TransactionOperation
-	 */
-	protected function setInvalid() {
-		$this->setIsValid(false);
+		
 		return $this;
 	}
 	

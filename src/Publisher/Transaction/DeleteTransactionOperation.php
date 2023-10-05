@@ -5,7 +5,7 @@
 
 namespace Orpheus\Publisher\Transaction;
 
-use Orpheus\Publisher\PermanentObject\PermanentObject;
+use Orpheus\EntityDescriptor\Entity\PermanentEntity;
 
 /**
  * The DeleteTransactionOperation class
@@ -19,17 +19,14 @@ class DeleteTransactionOperation extends TransactionOperation {
 	/**
 	 * The object of this operation
 	 *
-	 * @var PermanentObject
+	 * @var PermanentEntity
 	 */
-	protected $object;
+	protected PermanentEntity $object;
 	
 	/**
 	 * Constructor
-	 *
-	 * @param string $class
-	 * @param PermanentObject $object
 	 */
-	public function __construct($class, PermanentObject $object) {
+	public function __construct(string $class, PermanentEntity $object) {
 		parent::__construct($class);
 		$this->object = $object;
 	}
@@ -38,19 +35,19 @@ class DeleteTransactionOperation extends TransactionOperation {
 	 *
 	 * {@inheritDoc}
 	 * @param array $errors
-	 * @see \Orpheus\Publisher\Transaction\TransactionOperation::validate()
+	 * @see TransactionOperation::validate()
 	 */
-	public function validate(&$errors = 0) {
-		$this->setIsValid(!$this->object->isDeleted());
+	public function validate(int &$errors = 0): void {
+		$newErrors = 0;
+		if( $this->object->isDeleted() ) {
+			$newErrors++;
+		}
+		$this->setIsValid(!$newErrors);
+		$errors += $newErrors;
 	}
 	
-	/**
-	 *
-	 * {@inheritDoc}
-	 * @see \Orpheus\Publisher\Transaction\TransactionOperation::run()
-	 */
-	public function run() {
-		// Testing generating query in this class
+	public function run(): bool {
+		/** @var PermanentEntity $class */
 		$class = $this->class;
 		
 		$options = [
@@ -65,9 +62,9 @@ class DeleteTransactionOperation extends TransactionOperation {
 		if( $r ) {
 			// Success
 			$this->object->markAsDeleted();
-			return 1;
+			return true;
 		}
-		return 0;
+		return false;
 		
 	}
 }

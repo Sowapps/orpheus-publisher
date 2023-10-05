@@ -10,7 +10,7 @@ use Orpheus\Exception\UserException;
 /**
  * The invalid field exception class
  *
- * This exception is thrown when we try to validate a form field and it's invalid.
+ * This exception is thrown when we try to validate a form field, and it's invalid.
  */
 class InvalidFieldException extends UserException {
 	
@@ -52,14 +52,10 @@ class InvalidFieldException extends UserException {
 	/**
 	 * Constructor
 	 *
-	 * @param string $key
-	 * @param string $field
-	 * @param ?string $value
-	 * @param string $type
-	 * @param string $domain
-	 * @param array|object|mixed $typeArgs
+	 * @param string|null $domain
+	 * @param array|object|scalar $typeArgs
 	 */
-	public function __construct(string $key, string $field, ?string $value, $type = null, $domain = null, $typeArgs = []) {
+	public function __construct(string $key, string $field, ?string $value, ?string $type = null, string $domain = null, mixed $typeArgs = []) {
 		parent::__construct($field . '_' . $key, $domain);
 		$this->key = $key;
 		$this->field = $field;
@@ -70,8 +66,6 @@ class InvalidFieldException extends UserException {
 	
 	/**
 	 * Get the field
-	 *
-	 * @return string
 	 */
 	public function getField(): string {
 		return $this->field;
@@ -79,8 +73,6 @@ class InvalidFieldException extends UserException {
 	
 	/**
 	 * Get the type of the field
-	 *
-	 * @return string
 	 */
 	public function getType(): ?string {
 		return $this->type;
@@ -88,8 +80,6 @@ class InvalidFieldException extends UserException {
 	
 	/**
 	 * Get the field's value that is not valid
-	 *
-	 * @return string
 	 */
 	public function getValue(): string {
 		
@@ -99,14 +89,12 @@ class InvalidFieldException extends UserException {
 	/**
 	 * Remove args from this exception, this is required for some tests (generating possible errors)
 	 */
-	public function removeArgs() {
+	public function removeArgs(): void {
 		$this->args = [];
 	}
 	
 	/**
 	 * Get the field's arguments
-	 *
-	 * @return array
 	 */
 	public function getArgs(): array {
 		return $this->args;
@@ -114,8 +102,6 @@ class InvalidFieldException extends UserException {
 	
 	/**
 	 * Get the key for this field and message
-	 *
-	 * @return string
 	 */
 	public function getKey(): string {
 		return $this->key;
@@ -135,15 +121,8 @@ class InvalidFieldException extends UserException {
 	
 	/**
 	 * Convert an UserException into an InvalidFieldException using other parameters
-	 *
-	 * @param UserException $e
-	 * @param string $field
-	 * @param ?string $value
-	 * @param string $type
-	 * @param array $args
-	 * @return InvalidFieldException
 	 */
-	public static function from(UserException $e, $field, $value, $type = null, $args = []): InvalidFieldException {
+	public static function from(UserException $e, string $field, ?string $value, ?string $type = null, array $args = []): InvalidFieldException {
 		return new static($e->getMessage(), $field, $value, $type, $e->getDomain(), $args);
 	}
 }

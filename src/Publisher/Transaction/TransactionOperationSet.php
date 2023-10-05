@@ -5,7 +5,10 @@
 
 namespace Orpheus\Publisher\Transaction;
 
-use Orpheus\SqlAdapter\SqlAdapter;
+use ArrayIterator;
+use IteratorAggregate;
+use Orpheus\SqlAdapter\AbstractSqlAdapter;
+use Traversable;
 
 /**
  * The Transaction Object Set class
@@ -15,53 +18,47 @@ use Orpheus\SqlAdapter\SqlAdapter;
  * @author Florent Hazard <contact@sowapps.com>
  *
  */
-class TransactionOperationSet implements \IteratorAggregate {
+class TransactionOperationSet implements IteratorAggregate {
 	
 	/**
 	 * List of operation in this set
 	 *
 	 * @var TransactionOperation[] $operations
 	 */
-	protected $operations = [];
+	protected array $operations = [];
 	
 	/**
 	 * The SQL Adapter to use
 	 *
-	 * @var SqlAdapter $sqlAdapter
+	 * @var AbstractSqlAdapter $sqlAdapter
 	 */
-	protected $sqlAdapter;
+	protected AbstractSqlAdapter $sqlAdapter;
 	
 	/**
 	 * Constructor
-	 *
-	 * @param SqlAdapter $sqlAdapter
 	 */
-	public function __construct(SqlAdapter $sqlAdapter) {
+	public function __construct(AbstractSqlAdapter $sqlAdapter) {
 		$this->sqlAdapter = $sqlAdapter;
 	}
 	
 	/**
 	 * Add an operation to this set
-	 *
-	 * @param TransactionOperation $operation
 	 */
-	public function add(TransactionOperation $operation) {
+	public function add(TransactionOperation $operation): void {
 		$this->operations[] = $operation;
 	}
 	
 	/**
 	 * Get the SQL Adapter
-	 *
-	 * @return SqlAdapter
 	 */
-	public function getSqlAdapter(): SqlAdapter {
+	public function getSqlAdapter(): AbstractSqlAdapter {
 		return $this->sqlAdapter;
 	}
 	
 	/**
 	 * Try to apply operations
 	 */
-	public function save() {
+	public function save(): void {
 		if( !$this->operations ) {
 			return;
 		}
@@ -74,7 +71,7 @@ class TransactionOperationSet implements \IteratorAggregate {
 	/**
 	 * Validate operations, before applying
 	 */
-	protected function validateOperations() {
+	protected function validateOperations(): void {
 		$errors = 0;
 		foreach( $this->operations as $operation ) {
 			$operation->setTransactionOperationSet($this);
@@ -85,20 +82,15 @@ class TransactionOperationSet implements \IteratorAggregate {
 	/**
 	 * Run operation, these will be applied into DBMS
 	 */
-	protected function runOperations() {
+	protected function runOperations(): void {
 		foreach( $this->operations as $operation ) {
 			$operation->setTransactionOperationSet($this);
 			$operation->runIfValid();
 		}
 	}
 	
-	/**
-	 *
-	 * {@inheritDoc}
-	 * @see IteratorAggregate::getIterator()
-	 */
-	public function getIterator() {
-		return new \ArrayIterator($this->operations);
+	public function getIterator(): Traversable {
+		return new ArrayIterator($this->operations);
 	}
 	
 }
