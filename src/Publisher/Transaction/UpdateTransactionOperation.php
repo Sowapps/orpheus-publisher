@@ -83,7 +83,9 @@ class UpdateTransactionOperation extends TransactionOperation {
 		$class = $this->class;
 		$input = $this->data;
 		$class::onEdit($input, null);
-		$query = $class::requestUpdate()->fields($input);
+		$query = $class::requestUpdate()
+			->fields($input)
+			->where('id', '=', $this->entity->id());
 		$r = $query->run();
 		if( $r ) {
 			// Success
