@@ -6,6 +6,7 @@
 namespace Orpheus\Publisher\Transaction;
 
 use Orpheus\EntityDescriptor\Entity\PermanentEntity;
+use Orpheus\Publisher\Validation\Validation;
 use Orpheus\SqlAdapter\AbstractSqlAdapter;
 
 abstract class TransactionOperation {
@@ -32,13 +33,6 @@ abstract class TransactionOperation {
 	protected ?AbstractSqlAdapter $sqlAdapter = null;
 	
 	/**
-	 * If this Operation is valid
-	 *
-	 * @var boolean
-	 */
-	protected bool $isValid = false;
-	
-	/**
 	 * Constructor
 	 */
 	public function __construct(string $class) {
@@ -58,25 +52,9 @@ abstract class TransactionOperation {
 	}
 	
 	/**
-	 * If this operation is valid
-	 */
-	public function isValid(): bool {
-		return $this->isValid;
-	}
-	
-	/**
-	 * Set this operation validity
-	 */
-	protected function setIsValid(bool $valid): static {
-		$this->isValid = $valid;
-		
-		return $this;
-	}
-	
-	/**
 	 * Validate this operation
 	 */
-	public abstract function validate(int &$errors = 0);
+	public abstract function validate(): Validation;
 	
 	/**
 	 * Get the SQL Adapter

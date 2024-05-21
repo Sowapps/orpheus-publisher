@@ -64,6 +64,16 @@ class InvalidFieldException extends UserException {
 		$this->args = is_array($typeArgs) ? $typeArgs : (is_object($typeArgs) ? (array) $typeArgs : [$typeArgs]);
 	}
 	
+	public function getExtraData(): array {
+		return [
+			'key' => $this->getKey(),
+			'field' => $this->getField(),
+			'type' => $this->getType(),
+			'value' => $this->getValue(),
+			'args' => $this->getArgs(),
+		];
+	}
+	
 	/**
 	 * Get the field
 	 */

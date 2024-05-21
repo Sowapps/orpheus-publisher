@@ -7,6 +7,7 @@ namespace Orpheus\Publisher\Transaction;
 
 use ArrayIterator;
 use IteratorAggregate;
+use Orpheus\Publisher\Validation\Validation;
 use Orpheus\SqlAdapter\AbstractSqlAdapter;
 use Traversable;
 
@@ -63,20 +64,24 @@ class TransactionOperationSet implements IteratorAggregate {
 			return;
 		}
 		// Validate all operations before saving it
-		$this->validateOperations();
-		// Then operations are valid, so we save it
-		$this->runOperations();
+		$validation = $this->validateOperations();
+		if( $validation->isValid() ) {
+			// Then operations are valid, so we save it
+			$this->runOperations();
+		}
 	}
 	
 	/**
 	 * Validate operations, before applying
 	 */
-	protected function validateOperations(): void {
-		$errors = 0;
+	protected function validateOperations(): Validation {
+		$validation = new Validation();
 		foreach( $this->operations as $operation ) {
 			$operation->setTransactionOperationSet($this);
-			$operation->validate($errors);
+			$validation->merge($operation->validate());
 		}
+		
+		return $validation;
 	}
 	
 	/**
@@ -85,7 +90,7 @@ class TransactionOperationSet implements IteratorAggregate {
 	protected function runOperations(): void {
 		foreach( $this->operations as $operation ) {
 			$operation->setTransactionOperationSet($this);
-			$operation->runIfValid();
+			$operation->run();
 		}
 	}
 	

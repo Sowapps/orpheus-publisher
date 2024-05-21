@@ -6,7 +6,7 @@
 namespace Orpheus\Publisher\Transaction;
 
 use Orpheus\EntityDescriptor\Entity\PermanentEntity;
-use Orpheus\Exception\UserException;
+use Orpheus\Publisher\Validation\Validation;
 
 /**
  * The UpdateTransactionOperation class
@@ -50,32 +50,25 @@ class UpdateTransactionOperation extends TransactionOperation {
 		$this->entity = $entity;
 	}
 	
-	/**
-	 *
-	 * {@inheritDoc}
-	 * @see TransactionOperation::validate()
-	 */
-	public function validate(int &$errors = 0): void {
+	public function validate(): Validation {
 		/** @var class-string<PermanentEntity> $class */
 		$class = $this->class;
-		$newErrors = 0;
+		$validation = new Validation();
 		
-		try {
-			$this->data = $class::checkUserInput($this->data, $this->fields, $this->entity, $newErrors);
+		$this->data = $class::validateInput($validation, $this->data, $this->fields, $this->entity);
 			// Moved to checkUserInput
 //			if( !$this->data ) {
 //				// No data to update, we can not process update
 //				$class::throwException('update.noChange');
 //			}
-			$class::onValidEdit($this->data, $this->entity, $newErrors);
-			$class::onValidUpdate($this->data, $newErrors);
-		} catch( UserException $exception ) {
-			reportError($exception);
-			$newErrors++;
+		if( $validation->isValid() ) {
+			$class::onValidEdit($this->data, $this->entity, $validation);
+		}
+		if( $validation->isValid() ) {
+			$class::onValidUpdate($this->data, $validation);
 		}
 		
-		$this->setIsValid(!$newErrors);
-		$errors += $newErrors;
+		return $validation;
 	}
 	
 	public function run(): bool {

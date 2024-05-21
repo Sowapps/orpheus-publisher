@@ -6,6 +6,7 @@
 namespace Orpheus\Publisher\Transaction;
 
 use Orpheus\EntityDescriptor\Entity\PermanentEntity;
+use Orpheus\Publisher\Validation\Validation;
 
 /**
  * The DeleteTransactionOperation class
@@ -31,19 +32,17 @@ class DeleteTransactionOperation extends TransactionOperation {
 		$this->object = $object;
 	}
 	
-	/**
-	 *
-	 * {@inheritDoc}
-	 * @param array $errors
-	 * @see TransactionOperation::validate()
-	 */
-	public function validate(int &$errors = 0): void {
-		$newErrors = 0;
+	public function validate(): Validation {
+		/** @var class-string<PermanentEntity> $class */
+		$class = $this->class;
+		
+		$validation = new Validation();
+		
 		if( $this->object->isDeleted() ) {
-			$newErrors++;
+			$validation->addError('alreadyDeleted', $class::getDomain());
 		}
-		$this->setIsValid(!$newErrors);
-		$errors += $newErrors;
+		
+		return $validation;
 	}
 	
 	public function run(): bool {

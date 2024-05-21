@@ -7,6 +7,7 @@ namespace Orpheus\Publisher\Transaction;
 
 use Orpheus\EntityDescriptor\Entity\PermanentEntity;
 use Orpheus\Exception\UserException;
+use Orpheus\Publisher\Validation\Validation;
 
 /**
  * The CreateTransactionOperation class
@@ -44,28 +45,21 @@ class CreateTransactionOperation extends TransactionOperation {
 		$this->fields = $fields;
 	}
 	
-	/**
-	 *
-	 * {@inheritDoc}
-	 * @see TransactionOperation::validate()
-	 */
-	public function validate(int &$errors = 0): void {
+	public function validate(): Validation {
 		/** @var class-string<PermanentEntity> $class */
 		$class = $this->class;
 		
-		$newErrors = 0;
+		$validation = new Validation();
 		
-		try {
-			$this->data = $class::checkUserInput($this->data, $this->fields, null, $newErrors);
-			$class::onValidEdit($this->data, null, $newErrors);
-			$class::onValidCreate($this->data, $newErrors);
-		} catch( UserException $exception ) {
-			reportError($exception);
-			$newErrors++;
+		$this->data = $class::validateInput($validation, $this->data, $this->fields);
+		if($validation->isValid()) {
+			$class::onValidEdit($this->data, null, $validation);
+		}
+		if($validation->isValid()) {
+			$class::onValidCreate($this->data, $validation);
 		}
 		
-		$this->setIsValid(!$newErrors);
-		$errors += $newErrors;
+		return $validation;
 	}
 	
 	public function run(): string|false {
